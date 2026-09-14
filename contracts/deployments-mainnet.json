@@ -1,0 +1,24 @@
+{
+  "chainId": 4663,
+  "network": "robinhood-mainnet",
+  "deployedAt": 1789422033292000,
+  "deployer": "0x97D3dA2Df311a429954c2661B754dfC500F82B7C",
+  "hashMine": "0x6a0d11bb9a25690b2c149eb33a49817979f649b4",
+  "treasury": "0x07991fa1ccb661040287aabae56aafcfe27d4eba",
+  "treasuryOwner": "0x97D3dA2Df311a429954c2661B754dfC500F82B7C",
+  "feeEscrow": "0xd3AFEB2a57f70eF218Aa82451c51B2fb0416Ac9e",
+  "ponsFactory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+  "token": "0x1109c7ec30c93ff6e84af4c86ca6c6c1eef99b38",
+  "rewards": "ETH",
+  "params": {
+    "roundLength": 600,
+    "releaseBps": 48,
+    "targetShares": 4096,
+    "minDifficulty": 20
+  },
+  "txs": [
+    "0xc2fa98b8c5e5c5bc6d9c1d626a85bf54e0c6969f374acb8cbce71d470f19cfa1",
+    "0x4d9a965dddd9aab0baa12b19dd42006ad95d3d5b2c87940d2b1b170a359150c4"
+  ],
+  "gasPaidWei": "206692014636000"
+}

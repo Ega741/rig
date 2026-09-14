@@ -1,9 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "npm run build:testnet",
+  "buildCommand": "npm run build:mainnet",
   "outputDirectory": "dist",
   "headers": [
-    { "source": "/(.*)\\.wasm", "headers": [{ "key": "Content-Type", "value": "application/wasm" }] }
+    {
+      "source": "/(.*)\\.wasm",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/wasm"
+        }
+      ]
+    }
   ]
 }
