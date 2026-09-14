@@ -45,12 +45,16 @@ function loadSettings(): MinerSettings {
   return defaultSettings();
 }
 
+const IDLE_POLL_MS = 10_000;
+
 export function useMiner(config: UiConfig, beneficiary: Address | null) {
   const sessionKey = useMemo(() => SessionKey.loadOrCreate(localStorage), []);
   const clients = useMemo<ChainClients>(() => createClients(config.chain, config.rpcUrl, sessionKey.account), [config, sessionKey]);
   const [settings, setSettingsState] = useState<MinerSettings>(loadSettings);
   const [running, setRunning] = useState(false);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
+  /** Round and pool as read from the chain while no miner runs, so the page is never blank before Start. */
+  const [chainView, setChainView] = useState<Snapshot | null>(null);
   const [marks, setMarks] = useState<Mark[]>([]);
   const [lastShare, setLastShare] = useState<{ hash: Hex; bits: number } | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -145,6 +149,50 @@ export function useMiner(config: UiConfig, beneficiary: Address | null) {
     return () => clearInterval(timer);
   }, [running]);
 
+  useEffect(() => {
+    if (running) return;
+    const reader = new ViemChainReader(clients.publicClient, config.hashMine);
+    let cancelled = false;
+    const read = async () => {
+      try {
+        const state = await reader.roundState(beneficiary ?? '0x0000000000000000000000000000000000000000');
+        if (cancelled) return;
+        const roundStartsAt = (state.genesis + (Number(state.round) - 1) * state.roundLength) * 1000;
+        setChainView({
+          round: state.round,
+          roundStartsAt,
+          roundEndsAt: roundStartsAt + state.roundLength * 1000,
+          roundLength: state.roundLength,
+          releaseBps: state.releaseBps,
+          roundWork: state.roundWork,
+          ownWork: 0n,
+          challenge: state.challenge,
+          difficulty: 0,
+          minDifficulty: state.minDifficulty,
+          segment: 0n,
+          hashRate: 0,
+          hitsFound: 0,
+          sharesSubmitted: 0,
+          batchesSubmitted: 0,
+          buffered: 0,
+          rewardPool: state.rewardPool,
+          pending: state.pending,
+          engineErrors: [],
+          lastError: null,
+          lastTx: null,
+        });
+      } catch {
+        /* keep the last view; the next tick retries */
+      }
+    };
+    void read();
+    const timer = setInterval(() => void read(), IDLE_POLL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [running, clients, config.hashMine, beneficiary]);
+
   useEffect(() => () => controllerRef.current?.stop(), []);
 
   const claim = useCallback(async () => {
@@ -175,7 +223,7 @@ export function useMiner(config: UiConfig, beneficiary: Address | null) {
     gpuAvailable,
     gpuName,
     running,
-    snapshot,
+    snapshot: running ? snapshot : (chainView ?? snapshot),
     marks,
     lastShare,
     status,
