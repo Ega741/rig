@@ -1,0 +1,34 @@
+{
+  "name": "hashmine-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json && vite build",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:browser": "node scripts/browser-test.mjs",
+    "abi": "bash ../scripts/export-abi.sh",
+    "test:e2e": "node scripts/e2e-local.mjs",
+    "test:e2e-ui": "node scripts/e2e-ui.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "5.3.0",
+    "@fontsource-variable/instrument-sans": "5.3.0",
+    "@fontsource-variable/jetbrains-mono": "5.3.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "viem": "2.56.5"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "@webgpu/types": "0.1.72",
+    "playwright-core": "1.61.1",
+    "typescript": "5.9.3",
+    "vite": "8.3.0",
+    "vitest": "5.0.0"
+  }
+}
