@@ -4,7 +4,7 @@ Project name: **Rig** (`$RIG`), chosen 2026-09-14. The working name `hashmine` s
 
 Browser GPU/CPU mining of a PONS-launched token on Robinhood Chain. No NFTs, no team allocation: trading fees buy the token back into a mining pool, and shares of keccak proof-of-work split every round's release by work.
 
-Live: **https://rig.fan** (Vercel, Robinhood Chain testnet config). Source: https://github.com/Ega741/rig.
+Live: **https://rig.fan** Source: https://github.com/Ega741/rig.
 
 Spec: `docs/superpowers/specs/2026-09-14-hashmine-design.md`. Plans and execution notes: `docs/superpowers/plans/`.
 
