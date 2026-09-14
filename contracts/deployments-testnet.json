@@ -1,0 +1,13 @@
+{
+  "chainId": 46630,
+  "network": "robinhood-testnet",
+  "deployedAt": 1789388776018,
+  "deployer": "0xCeb7fefD392AA5fb7AF729b8e7d3Ad0757f357F4",
+  "token": "0x6a2831ae6085d7e24a8a4dad8486f47a66ae3f4c",
+  "hashMine": "0xe80b2b24dfb92e14a4294273c1b14ec42c4c15e4",
+  "txs": [
+    "0x07c8f56e2d3ebb433850710198faa49311dd3c716b6bed06e48614e9985b3d36",
+    "0xddbd5b71df833a92a90748497cfd5c054c652ca56cdb5604a653d4efad879101",
+    "0xcb79c8344e1d4fc5d819fbc38af705fecf918e4218986ed847d09c7946a0cb0d"
+  ]
+}
