@@ -1,12 +1,52 @@
-# Rig
+<p align="center">
+  <a href="https://rig.fan"><img src="web/public/social.png" alt="RIG.FAN" width="760"></a>
+</p>
 
-Project name: **Rig** (`$RIG`), chosen 2026-09-14. The working name `hashmine` survives in the share-pool contract `HashMine.sol`, the spec/plan file names and the WASM crate.
+<p align="center">
+  <a href="https://rig.fan"><img src="https://img.shields.io/badge/live-rig.fan-add064?style=flat-square&labelColor=07070a" alt="rig.fan"></a>
+  <a href="https://x.com/rigdotfan"><img src="https://img.shields.io/badge/X-%40rigdotfan-dee9fc?style=flat-square&labelColor=07070a" alt="@rigdotfan on X"></a>
+  <img src="https://img.shields.io/badge/chain-Robinhood%20Chain-65b24c?style=flat-square&labelColor=07070a" alt="Robinhood Chain">
+  <img src="https://img.shields.io/badge/launch-PONS-b9c4dd?style=flat-square&labelColor=07070a" alt="PONS">
+  <img src="https://img.shields.io/badge/miner-WebGPU%20%2B%20WASM-add064?style=flat-square&labelColor=07070a" alt="WebGPU + WASM">
+</p>
 
-Browser GPU/CPU mining of a PONS-launched token on Robinhood Chain. No NFTs, no team allocation: trading fees buy the token back into a mining pool, and shares of keccak proof-of-work split every round's release by work.
+# Rig (`$RIG`)
 
-Live: **https://rig.fan** Source: https://github.com/Ega741/rig.
+**A token you mine in the browser.** Open [rig.fan](https://rig.fan), press **Start**, and your GPU (WebGPU) or CPU (WASM) searches keccak shares for the current round. Trading fees on the token buy it back into the mining pool; every round splits the release between miners in proportion to work.
 
-Spec: `docs/superpowers/specs/2026-09-14-hashmine-design.md`. Plans and execution notes: `docs/superpowers/plans/`.
+No NFTs. No presale. No team allocation. Nothing to install.
+
+## How it works
+
+```
+ trade $RIG ── 3 % fee ──▶ PONS 1 % + creator 2 % ──▶ buyback ──▶ mining pool
+                                                                       │
+ browser miner ── keccak shares ──▶ HashMine ── round close ──▶ release ∝ work
+```
+
+1. **Fees.** Every trade pays 3 %: the PONS base fee (1 %) plus the creator tax (2 %). About 2.7 % of volume ends up with the project.
+2. **Buyback.** The treasury swaps collected fees into `$RIG` and sends it to `HashMine`. That is the pool's only inflow — no reserve, no emission schedule.
+3. **Rounds.** Every 600 s the pool releases 48 bps of itself to the round that just closed.
+4. **Shares.** A share is a nonce with `keccak256(beneficiary ‖ challenge ‖ nonce)` under the target. It is bound to your address, so nobody can submit your work as theirs. Reward = release × your work ÷ total work.
+5. **Session key.** The tab signs with a throwaway key that only pays gas. Rewards go to the beneficiary you chose.
+
+## The miner
+
+- **WebGPU** engine (WGSL keccak) with a **WASM** fallback (Rust), both in workers — the page stays responsive.
+- **Load cap.** Never more than **50 %** of your machine: the duty cycle is measured and enforced, adjustable down to 10 %.
+- **Difficulty per miner** with a gas floor: small rigs still get shares, big rigs don't spam the chain.
+- Nothing leaves the tab except the shares.
+
+## Tokenomics
+
+| | |
+|---|---|
+| Launch | [PONS](https://pons.fun) on Robinhood Chain |
+| Trade fee | 3 % (1 % PONS + 2 % creator) → ≈2.7 % of volume to the project |
+| Team / reserve | 0 |
+| Pool inflow | buybacks only |
+| Round | 600 s, releases 48 bps of the pool |
+| Rewards | proportional to work in the round |
 
 ## Layout
 
@@ -17,6 +57,9 @@ Spec: `docs/superpowers/specs/2026-09-14-hashmine-design.md`. Plans and executio
 | `web/` | Vite + React miner: engines (WASM workers, WebGPU), controller, UI |
 | `sim/` | Parameter simulation (`sim/RESULTS.md`) |
 | `scripts/` | `build-wasm.sh`, `export-abi.sh` |
+| `docs/` | Design spec and execution plans (`docs/superpowers/`) |
+
+The working name `hashmine` survives in the share-pool contract `HashMine.sol`, the spec/plan file names and the WASM crate.
 
 ## Commands
 
@@ -46,6 +89,13 @@ Browser tests need the cached Chromium 1243 (`~/Library/Caches/ms-playwright/chr
 
 ## Configuration (web)
 
-`VITE_CHAIN` (`local` | `testnet` | `mainnet`), `VITE_RPC_URL`, `VITE_HASHMINE_ADDRESS`, optional `VITE_TREASURY_ADDRESS` and `VITE_FEE_ESCROW_ADDRESS` (enable `harvest`). URL query parameters `chain`, `rpc`, `hashMine`, `treasury`, `feeEscrow`, `beneficiary` override them.
+`VITE_CHAIN` (`local` | `testnet` | `mainnet`), `VITE_RPC_URL`, `VITE_HASHMINE_ADDRESS`, optional `VITE_TREASURY_ADDRESS` and `VITE_FEE_ESCROW_ADDRESS` (enable `harvest`), `VITE_X_URL`. URL query parameters `chain`, `rpc`, `hashMine`, `treasury`, `feeEscrow`, `beneficiary` override them.
 
-The **Token** page watches a PONS launch on Robinhood Chain mainnet regardless of the mining chain: `VITE_PONS_TOKEN` (or `?token=0x…`, or paste it on the page) and optional `VITE_PONS_RPC_URL` (`?ponsRpc=`). It shows the creator's fees waiting in the fee escrow, on the bonding curve and in the Uniswap v4 hook, plus price, market cap and graduation progress, refreshed every 3 s.
+The **Token** page watches the PONS launch on Robinhood Chain mainnet regardless of the mining chain: `VITE_PONS_TOKEN` (or `?token=0x…`) and optional `VITE_PONS_RPC_URL` (`?ponsRpc=`). It shows the creator's fees waiting in the fee escrow, on the bonding curve and in the Uniswap v4 hook, plus price, market cap and graduation progress, refreshed every 3 s.
+
+## Links
+
+- Site: **https://rig.fan**
+- X: **https://x.com/rigdotfan**
+- Source: https://github.com/Ega741/rig
+- Chain: Robinhood Chain (Arbitrum Orbit) · Launchpad: PONS

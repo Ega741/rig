@@ -84,3 +84,37 @@ function textWidth(segments) {
 }
 
 console.log(`wrote ${out}banner.png (1500x500), avatar.png (400x400)`);
+
+// Social: 1280 x 640 (GitHub social preview, OG/Twitter 2:1). The card icon above the wordmark.
+{
+  const MAP = [
+    '.bb.............',
+    '.bbllllllllllll.',
+    '.bbl....l....ll.',
+    '.bbl....l....ll.',
+    '.bbl.ll.l.ll.ll.',
+    '.bbl.ll.l.ll.ll.',
+    '.bbl....l....ll.',
+    '.bbl....l....ll.',
+    '.bbllllllllllll.',
+    '.bbgggggggggggg.',
+  ];
+  const colours = { b: BRACKET, l: LIME, g: GREEN };
+  const c = canvas(1280, 640, BG);
+  dots(c, 40, 4);
+  const icon = 12; // 16 x 10 cells -> 192 x 120
+  const cell = 20; // wordmark 44 cells -> 880 x 140
+  const segs = [
+    { text: 'RIG', fill: LIME },
+    { text: '.FAN', fill: INK },
+  ];
+  const gapY = 56;
+  const total = 10 * icon + gapY + font.height * cell;
+  const top = Math.round((640 - total) / 2);
+  const ix = Math.round((1280 - 16 * icon) / 2);
+  MAP.forEach((row, y) => [...row].forEach((v, x) => v !== '.' && c.fillRect(ix + x * icon, top + y * icon, icon, icon, colours[v])));
+  const w = textWidth(segs) * cell;
+  text(c, segs, cell, Math.round((1280 - w) / 2), top + 10 * icon + gapY);
+  writeFileSync(`${out}social.png`, c.png());
+  console.log(`wrote ${out}social.png (1280x640)`);
+}
