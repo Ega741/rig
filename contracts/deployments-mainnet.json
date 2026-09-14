@@ -27,5 +27,14 @@
     "note": "v1, forwarded 100% to HashMine; never adopted; superseded 2026-09-15 by the 60/40 split"
   },
   "teamWallet": "0x5d463D7C333e4DDcdAF5338EaaB4dAA22932073E",
-  "teamBps": 6000
+  "teamBps": 6000,
+  "adopted": {
+    "tx": "0x6defccbe8c7fb6f47e5cf5668b594e58ecb0c79ba12381771f0927e0d15df33b",
+    "feeRecipientSince": "2026-09-15"
+  },
+  "firstHarvest": {
+    "tx": "0xc7c164abd3832c97eac731b85c8b88ac9a353c81f6ba833b3e56aed66f7ae16c",
+    "toMinersWei": "3156880950034701",
+    "toTeamWei": "4735321425052051"
+  }
 }

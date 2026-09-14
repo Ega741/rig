@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Jersey+10&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/app/pixel-frames.css">
+<style>
+:root{--bg:#07070a;--ink:#dee9fc;--ink-2:#b9c4dd;--ink-3:#6b7390;--panel:#1d1f26;--panel-2:#2b2d33;--frame:#3b3a45;--lime:#add064;--green:#65b24c;--cyan:#6fd3d5;--amber:#eabe57;--red:#e0664d;--dot:#2b2d33}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'DotGothic16','Courier New',monospace}
+.card{position:relative;width:1080px;height:1080px;overflow:hidden;background-color:var(--bg);
+  background-image:radial-gradient(var(--dot) 2.2px,transparent 2.6px);background-size:48px 48px;background-position:24px 24px;
+  padding:52px 60px 48px;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center}
+.wordmark svg{height:48px;shape-rendering:crispEdges}
+.tag{font-family:'Jersey 10';font-size:26px;letter-spacing:3px;color:var(--ink-2);text-transform:uppercase;line-height:1}
+.tag b{color:var(--lime);font-weight:400}
+.hero{display:flex;align-items:flex-start;gap:34px;margin-top:40px}
+.flame svg{width:80px;height:auto;shape-rendering:crispEdges}
+h1{font-family:'Jersey 10';font-weight:400;text-transform:uppercase;font-size:86px;line-height:.92;margin:0;letter-spacing:1px}
+h1 em{font-style:normal;color:var(--amber)}
+h1 .n{color:var(--red)}
+.panel{background:var(--panel);padding:26px 40px 30px;display:flex;flex-direction:column;gap:18px;margin-top:34px}
+.head{display:flex;justify-content:space-between;font-family:'Jersey 10';font-size:28px;letter-spacing:3px;color:var(--ink-2);text-transform:uppercase;line-height:1}
+.head b{color:var(--red);font-weight:400}
+.flow{font-family:'VT323','Courier New',monospace;font-size:28px;line-height:1;letter-spacing:.5px;white-space:nowrap;display:flex;align-items:center;gap:18px}
+.flow .from{color:var(--ink)}.flow .arrow{color:var(--amber)}.flow .to{color:var(--red)}
+.bar{display:flex;gap:4px}
+.bar i{flex:1;height:22px;background:var(--panel-2)}
+.bar i.b{background:var(--red)}
+.legend{display:flex;justify-content:space-between;font-family:'Jersey 10';font-size:24px;letter-spacing:2px;color:var(--ink-3);text-transform:uppercase;line-height:1}
+.legend b{color:var(--red);font-weight:400}
+.tx{font-family:'VT323','Courier New',monospace;font-size:19px;color:var(--ink-3);letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx b{color:var(--ink-2);font-weight:400}
+.foot{display:flex;flex-direction:column;gap:8px;margin-top:auto;font-size:20px;color:var(--ink-2);line-height:1.25;gap:24px}
+.foot b{color:var(--lime);font-weight:400}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top">
+    <div class="wordmark">{{WORDMARK}}</div>
+    <div class="tag">ROBINHOOD CHAIN · <b>MAINNET</b></div>
+  </div>
+  <div class="hero">
+    <div class="flame"><svg viewBox="0 0 9 12" shape-rendering="crispEdges" role="img" aria-label="burn"><rect x="4" y="0" width="1" height="1" fill="#e0664d"/><rect x="4" y="1" width="1" height="1" fill="#e0664d"/><rect x="3" y="2" width="1" height="1" fill="#e0664d"/><rect x="4" y="2" width="1" height="1" fill="#e0664d"/><rect x="3" y="3" width="1" height="1" fill="#e0664d"/><rect x="4" y="3" width="1" height="1" fill="#e0664d"/><rect x="5" y="3" width="1" height="1" fill="#e0664d"/><rect x="2" y="4" width="1" height="1" fill="#e0664d"/><rect x="3" y="4" width="1" height="1" fill="#e0664d"/><rect x="4" y="4" width="1" height="1" fill="#e0664d"/><rect x="5" y="4" width="1" height="1" fill="#eabe57"/><rect x="6" y="4" width="1" height="1" fill="#e0664d"/><rect x="2" y="5" width="1" height="1" fill="#e0664d"/><rect x="3" y="5" width="1" height="1" fill="#e0664d"/><rect x="4" y="5" width="1" height="1" fill="#eabe57"/><rect x="5" y="5" width="1" height="1" fill="#eabe57"/><rect x="6" y="5" width="1" height="1" fill="#e0664d"/><rect x="1" y="6" width="1" height="1" fill="#e0664d"/><rect x="2" y="6" width="1" height="1" fill="#e0664d"/><rect x="3" y="6" width="1" height="1" fill="#eabe57"/><rect x="4" y="6" width="1" height="1" fill="#eabe57"/><rect x="5" y="6" width="1" height="1" fill="#eabe57"/><rect x="6" y="6" width="1" height="1" fill="#eabe57"/><rect x="7" y="6" width="1" height="1" fill="#e0664d"/><rect x="1" y="7" width="1" height="1" fill="#e0664d"/><rect x="2" y="7" width="1" height="1" fill="#e0664d"/><rect x="3" y="7" width="1" height="1" fill="#eabe57"/><rect x="4" y="7" width="1" height="1" fill="#dee9fc"/><rect x="5" y="7" width="1" height="1" fill="#eabe57"/><rect x="6" y="7" width="1" height="1" fill="#eabe57"/><rect x="7" y="7" width="1" height="1" fill="#e0664d"/><rect x="1" y="8" width="1" height="1" fill="#e0664d"/><rect x="2" y="8" width="1" height="1" fill="#e0664d"/><rect x="3" y="8" width="1" height="1" fill="#eabe57"/><rect x="4" y="8" width="1" height="1" fill="#dee9fc"/><rect x="5" y="8" width="1" height="1" fill="#eabe57"/><rect x="6" y="8" width="1" height="1" fill="#eabe57"/><rect x="7" y="8" width="1" height="1" fill="#e0664d"/><rect x="8" y="8" width="1" height="1" fill="#e0664d"/><rect x="1" y="9" width="1" height="1" fill="#e0664d"/><rect x="2" y="9" width="1" height="1" fill="#e0664d"/><rect x="3" y="9" width="1" height="1" fill="#eabe57"/><rect x="4" y="9" width="1" height="1" fill="#eabe57"/><rect x="5" y="9" width="1" height="1" fill="#eabe57"/><rect x="6" y="9" width="1" height="1" fill="#eabe57"/><rect x="7" y="9" width="1" height="1" fill="#e0664d"/><rect x="2" y="10" width="1" height="1" fill="#e0664d"/><rect x="3" y="10" width="1" height="1" fill="#eabe57"/><rect x="4" y="10" width="1" height="1" fill="#eabe57"/><rect x="5" y="10" width="1" height="1" fill="#eabe57"/><rect x="6" y="10" width="1" height="1" fill="#e0664d"/><rect x="3" y="11" width="1" height="1" fill="#e0664d"/><rect x="4" y="11" width="1" height="1" fill="#e0664d"/><rect x="5" y="11" width="1" height="1" fill="#e0664d"/></svg></div>
+    <h1>Dev supply<br><em>burned.</em><br><span class="n">27,777,777</span><br>$RIG gone.</h1>
+  </div>
+  <section class="panel frame frame--night">
+    <div class="head"><span>Burn</span><span><b>2.78%</b> of supply</span></div>
+    <div class="flow"><span class="from">0x5d46…073E</span><span class="arrow">──▶</span><span class="to">0x…dEaD</span><span class="from" style="margin-left:auto">27,777,777.78 RIG</span></div>
+    <div class="bar"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="b"></i><i class="b"></i></div>
+    <div class="legend"><span>total supply 1,000,000,000</span><span><b>burned</b> · dev wallet balance: 0</span></div>
+    <div class="tx"><b>tx</b> 0x40526f367d8a6b0f359cf9e4665f343d54515ff92a2fff34eb16104e86633fc1</div>
+  </section>
+  <div class="foot">
+    <span>verify: robinhoodchain.blockscout.com · team holds zero $RIG</span>
+    <span><b>rig.fan</b> → Start</span>
+  </div>
+</div>
+</body>
+</html>
