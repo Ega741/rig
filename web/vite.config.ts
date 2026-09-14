@@ -6,7 +6,6 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
-  // share-vectors.json lives in contracts/, outside the Vite root.
   server: { fs: { allow: [repoRoot] } },
   worker: { format: 'es' },
   build: {

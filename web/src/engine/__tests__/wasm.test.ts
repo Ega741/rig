@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { getAddress, type Address, type Hex } from 'viem';
-import vectors from '../../../../contracts/vectors/share-vectors.json';
+import vectors from '../vectors/share-vectors.json';
 import { bytesToHashHex, headerBytes, isValidShare, makeNonce, splitNonce } from '../share';
 import { KeccakWasm } from '../wasm';
 

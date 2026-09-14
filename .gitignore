@@ -8,3 +8,4 @@ web/dist/
 web/e2e-artifacts/
 .env
 .DS_Store
+web/.vercel/

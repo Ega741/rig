@@ -4,12 +4,13 @@ import { shortAddress } from './format';
 import { Docs } from './pages/Docs';
 import { Mine } from './pages/Mine';
 import { Stats } from './pages/Stats';
+import { Token } from './pages/Token';
 
-type Route = 'mine' | 'stats' | 'docs';
+type Route = 'mine' | 'token' | 'stats' | 'docs';
 
 function routeFromHash(hash: string): Route {
   const name = hash.replace(/^#\/?/, '');
-  return name === 'stats' || name === 'docs' ? name : 'mine';
+  return name === 'stats' || name === 'docs' || name === 'token' ? name : 'mine';
 }
 
 function useHashRoute(): Route {
@@ -76,6 +77,9 @@ export function App() {
           <a href="#/mine" aria-current={route === 'mine' ? 'page' : undefined}>
             Mine
           </a>
+          <a href="#/token" aria-current={route === 'token' ? 'page' : undefined}>
+            Token
+          </a>
           <a href="#/stats" aria-current={route === 'stats' ? 'page' : undefined}>
             Stats
           </a>
@@ -90,6 +94,7 @@ export function App() {
       <div className="divider" />
       <main className="page">
         {route === 'mine' && <Mine config={config} />}
+        {route === 'token' && <Token config={config} />}
         {route === 'stats' && <Stats config={config} />}
         {route === 'docs' && <Docs config={config} />}
       </main>
@@ -105,6 +110,7 @@ export function App() {
         <div>
           <div className="label">Pages</div>
           <a href="#/mine">Mine</a>
+          <a href="#/token">Token</a>
           <a href="#/stats">Stats</a>
           <a href="#/docs">Docs</a>
         </div>

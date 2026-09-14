@@ -10,7 +10,8 @@
     "test:browser": "node scripts/browser-test.mjs",
     "abi": "bash ../scripts/export-abi.sh",
     "test:e2e": "node scripts/e2e-local.mjs",
-    "test:e2e-ui": "node scripts/e2e-ui.mjs"
+    "test:e2e-ui": "node scripts/e2e-ui.mjs",
+    "build:testnet": "tsc -p tsconfig.json && vite build --mode testnet"
   },
   "dependencies": {
     "@fontsource/dotgothic16": "^5.3.0",

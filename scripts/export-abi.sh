@@ -6,6 +6,8 @@ OUT="$ROOT/web/src/chain/abi"
 mkdir -p "$OUT"
 cd "$ROOT/contracts"
 forge build --silent
+# The web package must be self-contained (Vercel deploys web/ alone): keep a copy of the hash vectors there.
+cp "$ROOT/contracts/vectors/share-vectors.json" "$ROOT/web/src/engine/vectors/share-vectors.json"
 for NAME in HashMine PonsTreasury; do
   LOWER="$(echo "${NAME:0:1}" | tr '[:upper:]' '[:lower:]')${NAME:1}"
   ABI="$(forge inspect "$NAME" abi --json)"

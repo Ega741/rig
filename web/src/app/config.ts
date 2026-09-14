@@ -1,9 +1,14 @@
 import { getAddress, isAddress, type Address } from 'viem';
 import { configFromEnv, type AppConfig } from '../chain/chains';
+import { ROBINHOOD_RPC } from '../chain/pons';
 
 export interface UiConfig extends AppConfig {
   /** Beneficiary fixed by the URL (?beneficiary=0x…); otherwise the page asks for a wallet or an address. */
   beneficiary: Address | null;
+  /** PONS launch to watch on the Token page (VITE_PONS_TOKEN or ?token=); null lets the page ask for one. */
+  ponsToken: Address | null;
+  /** RPC for the PONS reads; always Robinhood Chain mainnet. */
+  ponsRpcUrl: string;
 }
 
 function addressParam(value: string | null, name: string): Address | null {
@@ -31,5 +36,7 @@ export function loadConfig(env: Record<string, string | undefined>, search: stri
     treasury: addressParam(base.treasury, 'VITE_TREASURY_ADDRESS'),
     feeEscrow: addressParam(base.feeEscrow, 'VITE_FEE_ESCROW_ADDRESS'),
     beneficiary: addressParam(query.get('beneficiary'), 'beneficiary'),
+    ponsToken: addressParam(query.get('token') ?? env.VITE_PONS_TOKEN ?? null, 'token'),
+    ponsRpcUrl: query.get('ponsRpc') ?? env.VITE_PONS_RPC_URL ?? ROBINHOOD_RPC,
   };
 }

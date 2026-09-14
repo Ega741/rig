@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getAddress, hexToBytes, type Address, type Hex } from 'viem';
-import vectors from '../../../../contracts/vectors/share-vectors.json';
+import vectors from '../vectors/share-vectors.json';
 import {
   MASK64,
   headerBytes,

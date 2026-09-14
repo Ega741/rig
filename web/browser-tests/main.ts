@@ -1,5 +1,5 @@
 import { getAddress, type Address, type Hex } from 'viem';
-import vectors from '../../contracts/vectors/share-vectors.json';
+import vectors from '../src/engine/vectors/share-vectors.json';
 import { CpuEngine } from '../src/engine/cpuEngine';
 import { GpuEngine } from '../src/engine/gpuEngine';
 import { bytesToHashHex, headerBytes, isValidShare, makeNonce, splitNonce } from '../src/engine/share';

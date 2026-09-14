@@ -45,3 +45,5 @@ Browser tests need the cached Chromium 1243 (`~/Library/Caches/ms-playwright/chr
 ## Configuration (web)
 
 `VITE_CHAIN` (`local` | `testnet` | `mainnet`), `VITE_RPC_URL`, `VITE_HASHMINE_ADDRESS`, optional `VITE_TREASURY_ADDRESS` and `VITE_FEE_ESCROW_ADDRESS` (enable `harvest`). URL query parameters `chain`, `rpc`, `hashMine`, `treasury`, `feeEscrow`, `beneficiary` override them.
+
+The **Token** page watches a PONS launch on Robinhood Chain mainnet regardless of the mining chain: `VITE_PONS_TOKEN` (or `?token=0x…`, or paste it on the page) and optional `VITE_PONS_RPC_URL` (`?ponsRpc=`). It shows the creator's fees waiting in the fee escrow, on the bonding curve and in the Uniswap v4 hook, plus price, market cap and graduation progress, refreshed every 3 s.
