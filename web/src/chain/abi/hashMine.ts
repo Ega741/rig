@@ -4,11 +4,6 @@ export const hashMineAbi = [
     "type": "constructor",
     "inputs": [
       {
-        "name": "token_",
-        "type": "address",
-        "internalType": "contract IERC20"
-      },
-      {
         "name": "params",
         "type": "tuple",
         "internalType": "struct HashMine.Params",
@@ -37,6 +32,10 @@ export const hashMineAbi = [
       }
     ],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "receive",
+    "stateMutability": "payable"
   },
   {
     "type": "function",
@@ -429,19 +428,6 @@ export const hashMineAbi = [
     "stateMutability": "view"
   },
   {
-    "type": "function",
-    "name": "token",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract IERC20"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
     "type": "event",
     "name": "Claimed",
     "inputs": [
@@ -600,14 +586,8 @@ export const hashMineAbi = [
   },
   {
     "type": "error",
-    "name": "SafeERC20FailedOperation",
-    "inputs": [
-      {
-        "name": "token",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
+    "name": "TransferFailed",
+    "inputs": []
   },
   {
     "type": "error",

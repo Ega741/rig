@@ -12,6 +12,11 @@ export const ponsTreasuryAbi = [
         "name": "factory_",
         "type": "address",
         "internalType": "contract IPonsFactory"
+      },
+      {
+        "name": "hashMine_",
+        "type": "address",
+        "internalType": "contract HashMine"
       }
     ],
     "stateMutability": "nonpayable"
@@ -19,71 +24,6 @@ export const ponsTreasuryAbi = [
   {
     "type": "receive",
     "stateMutability": "payable"
-  },
-  {
-    "type": "function",
-    "name": "CREATOR_TAX_BPS",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint16",
-        "internalType": "uint16"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "CURVE_MAX_NET_PPM",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "CURVE_MIN_OUT_BPS",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "HARVEST_INTERVAL",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "LAUNCH_CONFIG_ID",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -113,86 +53,21 @@ export const ponsTreasuryAbi = [
   },
   {
     "type": "function",
-    "name": "MIN_DIFFICULTY",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint8",
-        "internalType": "uint8"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "MIN_HARVEST",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "POOL_SQRT_PRICE_FLOOR_PPM",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "RELEASE_BPS",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "ROUND_LENGTH",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "TARGET_SHARES",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "acceptOwnership",
     "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "adopt",
+    "inputs": [
+      {
+        "name": "token_",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
@@ -255,12 +130,7 @@ export const ponsTreasuryAbi = [
     "inputs": [],
     "outputs": [
       {
-        "name": "spent",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "tokensOut",
+        "name": "forwarded",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -292,94 +162,6 @@ export const ponsTreasuryAbi = [
       }
     ],
     "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "launch",
-    "inputs": [
-      {
-        "name": "input",
-        "type": "tuple",
-        "internalType": "struct PonsTreasury.LaunchInput",
-        "components": [
-          {
-            "name": "name",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "symbol",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "logo",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "description",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "socials",
-            "type": "tuple",
-            "internalType": "struct IPonsFactory.Socials",
-            "components": [
-              {
-                "name": "twitter",
-                "type": "string",
-                "internalType": "string"
-              },
-              {
-                "name": "telegram",
-                "type": "string",
-                "internalType": "string"
-              },
-              {
-                "name": "discord",
-                "type": "string",
-                "internalType": "string"
-              },
-              {
-                "name": "website",
-                "type": "string",
-                "internalType": "string"
-              },
-              {
-                "name": "farcaster",
-                "type": "string",
-                "internalType": "string"
-              }
-            ]
-          },
-          {
-            "name": "expectedEconomics",
-            "type": "bytes32",
-            "internalType": "bytes32"
-          },
-          {
-            "name": "salt",
-            "type": "bytes32",
-            "internalType": "bytes32"
-          }
-        ]
-      }
-    ],
-    "outputs": [
-      {
-        "name": "token_",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "curve_",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "payable"
   },
   {
     "type": "function",
@@ -448,19 +230,6 @@ export const ponsTreasuryAbi = [
   },
   {
     "type": "function",
-    "name": "poolManager",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract IPoolManager"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "proposeMigration",
     "inputs": [
       {
@@ -506,58 +275,8 @@ export const ponsTreasuryAbi = [
     "stateMutability": "nonpayable"
   },
   {
-    "type": "function",
-    "name": "unlockCallback",
-    "inputs": [
-      {
-        "name": "data",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
     "type": "event",
-    "name": "Harvested",
-    "inputs": [
-      {
-        "name": "ethAvailable",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "ethSpent",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "tokensOut",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "phase",
-        "type": "uint8",
-        "indexed": false,
-        "internalType": "enum PonsGraduationPhase"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "Launched",
+    "name": "Adopted",
     "inputs": [
       {
         "name": "token",
@@ -570,12 +289,25 @@ export const ponsTreasuryAbi = [
         "type": "address",
         "indexed": true,
         "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "Harvested",
+    "inputs": [
+      {
+        "name": "forwarded",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
       },
       {
-        "name": "hashMine",
-        "type": "address",
+        "name": "phase",
+        "type": "uint8",
         "indexed": false,
-        "internalType": "address"
+        "internalType": "enum PonsGraduationPhase"
       }
     ],
     "anonymous": false
@@ -665,19 +397,8 @@ export const ponsTreasuryAbi = [
   },
   {
     "type": "error",
-    "name": "AlreadyLaunched",
+    "name": "AlreadyAdopted",
     "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "HarvestTooSoon",
-    "inputs": [
-      {
-        "name": "nextAt",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
   },
   {
     "type": "error",
@@ -708,7 +429,17 @@ export const ponsTreasuryAbi = [
   },
   {
     "type": "error",
-    "name": "NotPoolManager",
+    "name": "NotAdopted",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotEthQuoted",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotFeeRecipient",
     "inputs": []
   },
   {
@@ -736,6 +467,11 @@ export const ponsTreasuryAbi = [
   {
     "type": "error",
     "name": "ReentrancyGuardReentrantCall",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "TransferFailed",
     "inputs": []
   },
   {

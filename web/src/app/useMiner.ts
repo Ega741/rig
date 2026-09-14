@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Address, Hex } from 'viem';
-import { ViemChainReader, ViemHarvester, ViemSubmitter, createClients, unknownPrice, type ChainClients } from '../chain/hashMineChain';
+import { ViemChainReader, ViemHarvester, ViemSubmitter, createClients, ethReward, type ChainClients } from '../chain/hashMineChain';
 import { CpuEngine } from '../engine/cpuEngine';
 import { GpuEngine } from '../engine/gpuEngine';
 import type { Engine } from '../engine/types';
@@ -121,7 +121,7 @@ export function useMiner(config: UiConfig, beneficiary: Address | null) {
       engines,
       chain: new ViemChainReader(clients.publicClient, config.hashMine),
       submitter: new ViemSubmitter(clients, config.hashMine, sessionKey.account),
-      price: unknownPrice,
+      price: ethReward,
       intensity: settings.intensity,
     });
     controller.onSnapshot = (s) => setSnapshot(s);

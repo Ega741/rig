@@ -38,6 +38,11 @@ export function formatEth(wei: bigint): string {
   return formatTokens(wei, 4);
 }
 
+/** Mining rewards: wei as "0.027000 ETH" — six decimals, because a round's share can be well under a millieth. */
+export function formatReward(wei: bigint): string {
+  return `${formatTokens(wei, 6)} ETH`;
+}
+
 export function formatCountdown(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));
   const minutes = Math.floor(total / 60);

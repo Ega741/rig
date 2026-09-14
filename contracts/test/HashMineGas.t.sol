@@ -2,24 +2,18 @@
 pragma solidity 0.8.26;
 
 import {Test} from "forge-std/Test.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {HashMine} from "../src/HashMine.sol";
-import {MockERC20} from "./utils/MockERC20.sol";
 import {ShareFinder} from "./utils/ShareFinder.sol";
 
 /// @notice Execution gas of submit/claim, without intrinsic calldata cost. Numbers go to the plan report.
 contract HashMineGasTest is Test {
     uint8 internal constant D = 4;
-    MockERC20 internal token;
     HashMine internal mine;
 
     function setUp() public {
         vm.warp(1_000_000);
-        token = new MockERC20();
-        mine = new HashMine(
-            IERC20(address(token)), HashMine.Params({roundLength: 600, releaseBps: 48, targetShares: 4, minDifficulty: D})
-        );
-        token.mint(address(mine), 1e27);
+        mine = new HashMine(HashMine.Params({roundLength: 600, releaseBps: 48, targetShares: 4, minDifficulty: D}));
+        vm.deal(address(mine), 1e27);
     }
 
     function _measureSubmit(address who, uint256 count) internal returns (uint256 used) {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { createPublicClient, http } from 'viem';
 import { hashMineAbi } from '../../chain/abi/hashMine';
 import type { UiConfig } from '../config';
-import { formatTokens, formatWorkBits } from '../format';
+import { formatReward, formatWorkBits } from '../format';
 import { loadRounds, loadShareEntries, summarizeMiners, type MinerSummary, type RoundRow } from '../stats';
 
 const ROUNDS = 24;
@@ -95,7 +95,7 @@ export function Stats({ config }: { config: UiConfig }) {
                     <td>#{r.round.toString()}</td>
                     <td>{r.active ? `${r.minDifficulty} bits` : '—'}</td>
                     <td>{r.active ? formatWorkBits(r.work) : '—'}</td>
-                    <td>{r.closed ? formatTokens(r.release) : '—'}</td>
+                    <td>{r.closed ? formatReward(r.release) : '—'}</td>
                     <td>{r.closed ? 'closed' : r.active ? 'open' : 'empty'}</td>
                   </tr>
                 ))}

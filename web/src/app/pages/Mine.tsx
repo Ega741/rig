@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getAddress, isAddress, type Address } from 'viem';
 import type { UiConfig } from '../config';
-import { formatCountdown, formatEth, formatHashRate, formatTokens, formatWorkBits, shortAddress } from '../format';
+import { formatCountdown, formatEth, formatHashRate, formatReward, formatWorkBits, shortAddress } from '../format';
 import { HashStrip } from '../HashStrip';
 import { RoundBar } from '../RoundBar';
 import { maxCores, useMiner } from '../useMiner';
@@ -79,8 +79,8 @@ export function Mine({ config }: { config: UiConfig }) {
       <h1>Mine shares</h1>
       <p className="lead">
         Your browser hashes your address, the round challenge and a nonce until the result starts with enough zero bits. Each such hash is a
-        share. When a round ends, the pool releases {s ? (s.releaseBps / 100).toFixed(2) : '0.48'}% of itself and splits it by work among
-        everyone who sent shares.
+        share. When a round ends, the pool releases {s ? (s.releaseBps / 100).toFixed(2) : '0.48'}% of its ETH and splits it by work among
+        everyone who sent shares. The pool is the token's trading fees, forwarded as they come.
       </p>
 
       <section className={`panel frame ${miner.running ? 'frame--work' : 'frame--night'}`} aria-label="Your miner">
@@ -238,21 +238,21 @@ export function Mine({ config }: { config: UiConfig }) {
         <div className="panel__body">
           <div className="stat">
             <span className="label">In the pool</span>
-            <span className="num num--big">{formatTokens(s?.rewardPool ?? 0n)}</span>
+            <span className="num num--big">{formatReward(s?.rewardPool ?? 0n)}</span>
           </div>
           <div className="stats">
             <div className="stat">
               <span className="label">Released next</span>
-              <span className="num">{s ? formatTokens((s.rewardPool * BigInt(s.releaseBps)) / 10_000n) : '—'}</span>
+              <span className="num">{s ? formatReward((s.rewardPool * BigInt(s.releaseBps)) / 10_000n) : '—'}</span>
             </div>
             <div className="stat">
               <span className="label">Your estimate</span>
-              <span className="num num--lime">{s ? formatTokens(expectedThisRound) : '—'}</span>
+              <span className="num num--lime">{s ? formatReward(expectedThisRound) : '—'}</span>
             </div>
             <div className="stat">
               <span className="label">Pending</span>
               <span className="num num--amber" data-testid="pending">
-                {s ? formatTokens(s.pending) : '—'}
+                {s ? formatReward(s.pending) : '—'}
               </span>
             </div>
           </div>

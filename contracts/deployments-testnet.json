@@ -1,13 +1,18 @@
 {
   "chainId": 46630,
   "network": "robinhood-testnet",
-  "deployedAt": 1789388776018,
+  "deployedAt": 1789405275708000,
   "deployer": "0xCeb7fefD392AA5fb7AF729b8e7d3Ad0757f357F4",
-  "token": "0x6a2831ae6085d7e24a8a4dad8486f47a66ae3f4c",
-  "hashMine": "0xe80b2b24dfb92e14a4294273c1b14ec42c4c15e4",
+  "hashMine": "0x93eb6a909debe18a92e46a358212da7fcdf682d5",
+  "rewards": "ETH",
+  "seedWei": "3000000000000000",
   "txs": [
-    "0x07c8f56e2d3ebb433850710198faa49311dd3c716b6bed06e48614e9985b3d36",
-    "0xddbd5b71df833a92a90748497cfd5c054c652ca56cdb5604a653d4efad879101",
-    "0xcb79c8344e1d4fc5d819fbc38af705fecf918e4218986ed847d09c7946a0cb0d"
-  ]
+    "0x7e3b775297ed7c4bf706258fc7825155ab124ebf1ee4d3c8d6f5f389db2ce78c",
+    "0x783b26b227d28feb330efd5f5857b60456e401d2725da8e78954b2fc3b225ac2"
+  ],
+  "previous": {
+    "hashMine": "0xe80b2b24dfb92e14a4294273c1b14ec42c4c15e4",
+    "token": "0x6a2831ae6085d7e24a8a4dad8486f47a66ae3f4c",
+    "note": "first deployment, mock-token rewards; superseded 2026-09-14"
+  }
 }

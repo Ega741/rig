@@ -2,24 +2,20 @@
 pragma solidity 0.8.26;
 
 import {Test} from "forge-std/Test.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {HashMine} from "../src/HashMine.sol";
-import {MockERC20} from "./utils/MockERC20.sol";
 import {ShareFinder} from "./utils/ShareFinder.sol";
 
 contract HashMineHandler is Test {
     uint8 internal constant MAX_TEST_DIFFICULTY = 6;
 
     HashMine public immutable mine;
-    MockERC20 public immutable token;
     address[] internal _actors;
     uint256 public funded;
     uint256 public claimed;
 
-    constructor(HashMine mine_, MockERC20 token_) {
+    constructor(HashMine mine_) {
         mine = mine_;
-        token = token_;
         _actors.push(makeAddr("miner0"));
         _actors.push(makeAddr("miner1"));
         _actors.push(makeAddr("miner2"));
@@ -31,7 +27,9 @@ contract HashMineHandler is Test {
 
     function fund(uint256 amount) external {
         amount = bound(amount, 0, 1e24);
-        token.mint(address(mine), amount);
+        vm.deal(address(this), amount);
+        (bool ok,) = address(mine).call{value: amount}("");
+        require(ok, "fund");
         funded += amount;
     }
 
@@ -57,18 +55,13 @@ contract HashMineHandler is Test {
 }
 
 contract HashMineInvariantTest is Test {
-    MockERC20 internal token;
     HashMine internal mine;
     HashMineHandler internal handler;
 
     function setUp() public {
         vm.warp(1_000_000);
-        token = new MockERC20();
-        mine = new HashMine(
-            IERC20(address(token)),
-            HashMine.Params({roundLength: 600, releaseBps: 48, targetShares: 256, minDifficulty: 2})
-        );
-        handler = new HashMineHandler(mine, token);
+        mine = new HashMine(HashMine.Params({roundLength: 600, releaseBps: 48, targetShares: 256, minDifficulty: 2}));
+        handler = new HashMineHandler(mine);
         targetContract(address(handler));
         bytes4[] memory selectors = new bytes4[](4);
         selectors[0] = HashMineHandler.fund.selector;
@@ -78,12 +71,12 @@ contract HashMineInvariantTest is Test {
         targetSelector(FuzzSelector({addr: address(handler), selectors: selectors}));
     }
 
-    function invariant_tokensAreConserved() public view {
-        assertEq(token.balanceOf(address(mine)) + handler.claimed(), handler.funded());
+    function invariant_ethIsConserved() public view {
+        assertEq(address(mine).balance + handler.claimed(), handler.funded());
     }
 
     function invariant_reservedIsBacked() public view {
-        assertGe(token.balanceOf(address(mine)), mine.reserved());
+        assertGe(address(mine).balance, mine.reserved());
     }
 
     function invariant_owedToMinersWithinReserved() public view {

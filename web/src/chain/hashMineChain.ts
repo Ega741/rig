@@ -155,4 +155,5 @@ export class ViemHarvester {
 }
 
 /** Until the PONS price reader lands (plan 05), the price is unknown and batches are always sent. */
-export const unknownPrice: PriceSource = { weiPerToken: async () => null };
+/** Rewards are ETH: one reward-wei is worth exactly one wei, so the gas check needs no market price. */
+export const ethReward: PriceSource = { weiPerToken: async () => 10n ** 18n };

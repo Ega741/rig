@@ -19,7 +19,7 @@ export function freePort() {
   });
 }
 
-/** Starts anvil, deploys HashMine + mock token, returns clients and a stop() that kills anvil. */
+/** Starts anvil, deploys HashMine seeded with ETH, returns clients and a stop() that kills anvil. */
 export async function startLocalChain() {
   const port = await freePort();
   const rpcUrl = `http://127.0.0.1:${port}`;
@@ -37,13 +37,11 @@ export async function startLocalChain() {
   }
   const broadcast = JSON.parse(readFileSync(`${ROOT}contracts/broadcast/DeployLocal.s.sol/31337/run-latest.json`, 'utf8'));
   const hashMine = broadcast.transactions.find((t) => t.contractName === 'HashMine').contractAddress;
-  const token = broadcast.transactions.find((t) => t.contractName === 'MockERC20').contractAddress;
   const publicClient = createPublicClient({ transport: http(rpcUrl) });
   const funder = createWalletClient({ account: privateKeyToAccount(ANVIL_KEY), transport: http(rpcUrl) });
   return {
     rpcUrl,
     hashMine,
-    token,
     publicClient,
     async fund(address, eth = '1') {
       const hash = await funder.sendTransaction({ to: address, value: parseEther(eth), chain: null });

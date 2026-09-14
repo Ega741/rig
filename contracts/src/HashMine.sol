@@ -1,18 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
 /// @title HashMine
-/// @notice Keccak proof-of-work share pool. Miners submit shares for the current round; when a
-/// round closes it releases a fixed fraction of the token balance, split in proportion to work.
+/// @notice Keccak proof-of-work share pool paid in ETH. Miners submit shares for the current round;
+/// when a round closes it releases a fixed fraction of the contract's ETH balance, split in proportion
+/// to work. Any ETH sent to the contract (creator fees forwarded by PonsTreasury, donations) grows the pool.
 /// @dev Spec: docs/superpowers/specs/2026-09-14-hashmine-design.md, section 5.
 contract HashMine {
-    using SafeERC20 for IERC20;
-
     struct Params {
         uint256 roundLength;
         uint256 releaseBps;
@@ -41,7 +38,6 @@ contract HashMine {
     uint256 private constant BPS = 10_000;
     uint256 private constant PRECISION = 1e36;
 
-    IERC20 public immutable token;
     uint256 public immutable genesis;
     uint256 public immutable roundLength;
     uint256 public immutable releaseBps;
@@ -51,7 +47,7 @@ contract HashMine {
 
     /// @notice Latest round with at least one accepted share; 0 before the first share.
     uint256 public lastActiveRound;
-    /// @notice Tokens released to closed rounds and not yet claimed.
+    /// @notice ETH released to closed rounds and not yet claimed.
     uint256 public reserved;
 
     mapping(uint256 round => Round) private _rounds;
@@ -75,15 +71,14 @@ contract HashMine {
     error BadDifficulty(uint8 difficulty, uint8 minimum);
     error NonceNotIncreasing(uint256 index);
     error InvalidShare(uint256 index);
+    error TransferFailed();
 
-    constructor(IERC20 token_, Params memory params) {
-        if (address(token_) == address(0)) revert ZeroAddress();
+    constructor(Params memory params) {
         if (
             params.roundLength == 0 || params.releaseBps == 0 || params.releaseBps > BPS || params.targetShares == 0
                 || params.minDifficulty == 0 || params.minDifficulty > MAX_DIFFICULTY
         ) revert InvalidParams();
 
-        token = token_;
         genesis = block.timestamp;
         roundLength = params.roundLength;
         releaseBps = params.releaseBps;
@@ -91,6 +86,9 @@ contract HashMine {
         minDifficultyFloor = params.minDifficulty;
         genesisChallenge = keccak256(abi.encode(address(this), block.chainid, block.timestamp));
     }
+
+    /// @notice Every wei received grows the reward pool.
+    receive() external payable {}
 
     // -------------------------------------------------------------- mutations
 
@@ -122,7 +120,8 @@ contract HashMine {
         if (amount == 0) return 0;
         miner.claimable = 0;
         reserved -= amount;
-        token.safeTransfer(beneficiary, amount);
+        (bool ok,) = beneficiary.call{value: amount}("");
+        if (!ok) revert TransferFailed();
         emit Claimed(beneficiary, amount);
     }
 
@@ -136,9 +135,9 @@ contract HashMine {
         return genesis + (round - 1) * roundLength;
     }
 
-    /// @notice Tokens not yet released to any round.
+    /// @notice ETH not yet released to any round.
     function rewardPool() public view returns (uint256) {
-        return token.balanceOf(address(this)) - reserved;
+        return address(this).balance - reserved;
     }
 
     /// @notice Claimable amount plus the beneficiary's share of its last round; for a round that is

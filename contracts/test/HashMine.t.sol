@@ -2,24 +2,20 @@
 pragma solidity 0.8.26;
 
 import {Test} from "forge-std/Test.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {HashMine} from "../src/HashMine.sol";
-import {MockERC20} from "./utils/MockERC20.sol";
 import {ShareFinder} from "./utils/ShareFinder.sol";
 
 contract HashMineTest is Test {
     uint8 internal constant D = 4;
     uint256 internal constant T0 = 1_000_000;
 
-    MockERC20 internal token;
     HashMine internal mine;
     address internal alice = makeAddr("alice");
     address internal bob = makeAddr("bob");
 
     function setUp() public {
         vm.warp(T0);
-        token = new MockERC20();
-        mine = new HashMine(IERC20(address(token)), _params());
+        mine = new HashMine(_params());
     }
 
     function _params() internal pure returns (HashMine.Params memory) {
@@ -29,21 +25,18 @@ contract HashMineTest is Test {
     // ---------------------------------------------------------------- rounds
 
     function test_constructor_rejectsBadParams() public {
-        IERC20 t = IERC20(address(token));
         vm.expectRevert(HashMine.InvalidParams.selector);
-        new HashMine(t, HashMine.Params(0, 48, 4, D));
+        new HashMine(HashMine.Params(0, 48, 4, D));
         vm.expectRevert(HashMine.InvalidParams.selector);
-        new HashMine(t, HashMine.Params(600, 0, 4, D));
+        new HashMine(HashMine.Params(600, 0, 4, D));
         vm.expectRevert(HashMine.InvalidParams.selector);
-        new HashMine(t, HashMine.Params(600, 10_001, 4, D));
+        new HashMine(HashMine.Params(600, 10_001, 4, D));
         vm.expectRevert(HashMine.InvalidParams.selector);
-        new HashMine(t, HashMine.Params(600, 48, 0, D));
+        new HashMine(HashMine.Params(600, 48, 0, D));
         vm.expectRevert(HashMine.InvalidParams.selector);
-        new HashMine(t, HashMine.Params(600, 48, 4, 0));
+        new HashMine(HashMine.Params(600, 48, 4, 0));
         vm.expectRevert(HashMine.InvalidParams.selector);
-        new HashMine(t, HashMine.Params(600, 48, 4, 97));
-        vm.expectRevert(HashMine.ZeroAddress.selector);
-        new HashMine(IERC20(address(0)), _params());
+        new HashMine(HashMine.Params(600, 48, 4, 97));
     }
 
     function test_rounds_startAtGenesisAndAdvanceEveryRoundLength() public {
@@ -236,8 +229,11 @@ contract HashMineTest is Test {
 
     // ---------------------------------------------------------------- rewards
 
+    /// @dev Plain ETH transfer: the pool grows through receive().
     function _fund(uint256 amount) internal {
-        token.mint(address(mine), amount);
+        vm.deal(address(this), address(this).balance + amount);
+        (bool ok,) = address(mine).call{value: amount}("");
+        assertTrue(ok, "fund");
     }
 
     /// @dev Release of one round for a given pool, with the contract's integer rounding.
@@ -248,6 +244,20 @@ contract HashMineTest is Test {
     function test_rewardPool_countsDonations() public {
         _fund(1_000_000);
         assertEq(mine.rewardPool(), 1_000_000);
+        assertEq(address(mine).balance, 1_000_000);
+    }
+
+    function test_claim_revertsWhenBeneficiaryRejectsEth() public {
+        address rejecter = address(new EthRejecter());
+        _fund(1_000_000);
+        _submit(rejecter, D, 1);
+        _nextRound();
+        vm.expectRevert(HashMine.TransferFailed.selector);
+        mine.claim(rejecter);
+        // The whole call reverted: nothing paid, nothing lost, the reward is still owed.
+        assertEq(mine.reserved(), 0);
+        assertEq(mine.pending(rejecter), 4_800);
+        assertEq(address(mine).balance, 1_000_000);
     }
 
     function test_close_splitsReleaseByWork() public {
@@ -265,8 +275,8 @@ contract HashMineTest is Test {
         assertTrue(mine.roundInfo(1).closed);
         assertEq(mine.claim(alice), 3_600);
         assertEq(mine.claim(bob), 1_200);
-        assertEq(token.balanceOf(alice), 3_600);
-        assertEq(token.balanceOf(bob), 1_200);
+        assertEq(alice.balance, 3_600);
+        assertEq(bob.balance, 1_200);
         assertEq(mine.reserved(), 0);
     }
 
@@ -279,7 +289,7 @@ contract HashMineTest is Test {
         vm.expectEmit(address(mine));
         emit HashMine.Claimed(alice, 4_800);
         mine.claim(alice);
-        assertEq(token.balanceOf(alice), 4_800);
+        assertEq(alice.balance, 4_800);
     }
 
     function test_claim_isPayableByAnyoneToBeneficiary() public {
@@ -288,15 +298,15 @@ contract HashMineTest is Test {
         _nextRound();
         vm.prank(bob);
         mine.claim(alice);
-        assertEq(token.balanceOf(alice), 4_800);
-        assertEq(token.balanceOf(bob), 0);
+        assertEq(alice.balance, 4_800);
+        assertEq(bob.balance, 0);
     }
 
     function test_claim_doesNotPayRunningRound() public {
         _fund(1_000_000);
         _submit(alice, D, 1);
         assertEq(mine.claim(alice), 0);
-        assertEq(token.balanceOf(alice), 0);
+        assertEq(alice.balance, 0);
         assertFalse(mine.roundInfo(1).closed);
     }
 
@@ -365,3 +375,6 @@ contract HashMineTest is Test {
         assertLe(paidA + paidB, release);
     }
 }
+
+/// @dev A beneficiary that cannot receive ETH.
+contract EthRejecter {}

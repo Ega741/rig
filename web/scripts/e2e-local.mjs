@@ -30,8 +30,8 @@ const chain = await startLocalChain();
 let vite;
 let browser;
 try {
-  const { rpcUrl, hashMine, token, publicClient } = chain;
-  console.log(`anvil ${rpcUrl}; HashMine ${hashMine}; token ${token}`);
+  const { rpcUrl, hashMine, publicClient } = chain;
+  console.log(`anvil ${rpcUrl}; HashMine ${hashMine}`);
   const sessionKey = generatePrivateKey();
   const session = privateKeyToAccount(sessionKey);
   const beneficiary = privateKeyToAccount(generatePrivateKey()).address;
@@ -68,14 +68,19 @@ try {
     event: parseAbiItem('event RoundClosed(uint256 indexed round, uint256 work, uint256 release)'),
     fromBlock: 0n,
   });
-  check(closed.length > 0, `rounds closed: ${closed.length}`);
-  const balance = await publicClient.readContract({
-    address: token,
-    abi: [parseAbiItem('function balanceOf(address) view returns (uint256)')],
-    functionName: 'balanceOf',
-    args: [beneficiary],
+  check(closed.length > 0, `rounds closed: ${closed.length} (${closed.map((l) => `#${l.args.round}: ${l.args.release} wei`).join(', ')})`);
+  const receipt = result.claimTx ? await publicClient.getTransactionReceipt({ hash: result.claimTx }) : null;
+  const claimed = await publicClient.getLogs({
+    address: hashMine,
+    event: parseAbiItem('event Claimed(address indexed beneficiary, uint256 amount)'),
+    args: { beneficiary },
+    fromBlock: 0n,
   });
-  check(result.claimTx !== null && balance > 0n, `claimed ${balance} token-wei to beneficiary (tx ${result.claimTx})`);
+  const balance = await publicClient.getBalance({ address: beneficiary });
+  check(
+    receipt?.status === 'success' && claimed.length > 0 && balance > 0n,
+    `claimed ${balance} wei of ETH to beneficiary (tx ${result.claimTx}, status ${receipt?.status}, Claimed events ${claimed.map((l) => l.args.amount).join('/') || 'none'})`,
+  );
 } finally {
   if (browser) await browser.close();
   if (vite) await vite.close();

@@ -11,7 +11,7 @@ export function Docs({ config }: { config: UiConfig }) {
       <h2>Rounds</h2>
       <p>
         A round lasts {config.chain.id === 31337 ? '30 seconds on this local chain' : '10 minutes'}. When a round with at least one share ends, the
-        contract releases 0.48% of its token balance and splits it between everyone who sent shares, in proportion to work. A share of difficulty D
+        contract releases 0.48% of its ETH balance and splits it between everyone who sent shares, in proportion to work. A share of difficulty D
         counts as 2<sup>D</sup> work. Empty rounds release nothing and never catch up.
       </p>
       <h2>Difficulty</h2>
@@ -20,10 +20,11 @@ export function Docs({ config }: { config: UiConfig }) {
         for every empty round. Your miner picks its own difficulty above that minimum so that it finds about 32 shares per round and each share is
         worth at least twice the gas it costs to send.
       </p>
-      <h2>Where the tokens come from</h2>
+      <h2>Where the ETH comes from</h2>
       <p>
-        Trading the token pays a 3% fee. The part that reaches the project is spent buying the token back on the market and sending it to the mining
-        pool. Nothing is minted, nothing is reserved for the team: the pool is exactly what buybacks and donations put there.
+        Trading the token on PONS pays a 3% fee. The part that reaches the project, about 2.7% of every trade, is forwarded to the mining pool as
+        ETH, untouched: no buyback, no swap, no team cut. Anyone can trigger the forward with <code>harvest()</code>. The pool is exactly what the
+        fees and donations put there, and miners are the only ones who can take anything out.
       </p>
       <h2>Keys</h2>
       <p>

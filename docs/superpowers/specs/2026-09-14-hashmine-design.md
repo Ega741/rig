@@ -87,50 +87,43 @@
 
 ## 4. PonsTreasury
 
-### 4.1 Запуск
+> **Ревизия 2026-09-14 (вечер).** Решение пользователя: награда майнерам — не выкупленный токен, а сами комиссии в ETH. Выкуп убран целиком; `HashMine` держит пул в ETH. Токен запускает пользователь с кошелька на сайте PONS, контракт его не запускает.
 
-`launch(LaunchInput)` — `onlyOwner`, один раз, `msg.value == 0.0005 ETH`.
+### 4.1 Роль
 
-1. Вызывает `factory.launchToken(params, 0, address(0))` с параметрами:
-   - `creatorFeeRecipient = address(this)`;
-   - `creatorTaxBps = 200`;
-   - `buybackEnabled = false`;
-   - `expectedEconomics` — значение `previewLaunchEconomics(0, address(0))`, которое передаёт владелец. Защищает от смены условий PONS между подписью и включением транзакции;
-   - имя, тикер, лого, описание, соцсети, `salt` — из входа.
-2. Сохраняет `token` и `curve`.
-3. Деплоит `hashMine = new HashMine(token)`.
-4. Эмитит `Launched(token, curve, hashMine)`.
+`PonsTreasury` — получатель creator-fee токена. Он ничего не покупает и не свопит: всё, что пришло, уходит в `HashMine`. Функций вывода ETH или токенов у владельца нет.
 
-Если `PonsTreasury` вместе с creation-кодом `HashMine` не влезет в 24 КБ (EIP-170), `HashMine` деплоится отдельной фабрикой. Это проверяется первым делом при сборке.
+Конструктор: `(initialOwner, factory, hashMine)`. `memeHook` и `feeEscrow` читаются из фабрики.
 
-### 4.2 harvest()
+### 4.2 Привязка к токену: `adopt(token)`
 
-Вызывать может кто угодно, но не чаще раза в 12 с (`block.timestamp ≥ lastHarvestAt + 12`), иначе revert.
+`onlyOwner`, один раз. Порядок на мейннете:
 
-1. До graduation: `curve.sweepFees(0)` в `try/catch`. С выключенным buyback оператор PONS для этого не нужен.
-2. После graduation: `memeHook.sweepPoolFees(poolId, 0, 0)` в `try/catch`. Если в хуке висят комиссии в самом токене, вызов откатится с `InternalSwapRequiresOperator`, и их сконвертирует оператор PONS (замер в §2).
+1. Деплой `HashMine` и `PonsTreasury` (до запуска токена — адрес treasury нужен заранее).
+2. Пользователь запускает токен на PONS со своего кошелька (creatorTaxBps = 200, buyback выключен, пара — ETH).
+3. С того же кошелька: `factory.transferCreatorFeeRecipient(token, treasury)` (или сразу указать treasury получателем при запуске, если сайт PONS это позволяет).
+4. `treasury.adopt(token)`. Контракт проверяет по фабрике: запуск существует, `creatorFeeRecipient == treasury`, `pairToken == 0` (комиссии в ETH). Иначе revert — чужой или не-ETH токен привязать нельзя.
+
+### 4.3 harvest()
+
+Вызывать может кто угодно, без ограничений по частоте (без покупки нечего защищать от сэндвичей).
+
+1. До graduation: `curve.sweepFees(0)` в `try/catch`.
+2. После graduation: `memeHook.sweepPoolFees(poolId, 0, 0)` в `try/catch`. Комиссии в самом токене конвертирует в ETH оператор PONS (замер в §2), после чего они появляются в escrow.
 3. `feeEscrow.claim()` в `try/catch`.
-4. `amount = address(this).balance`. Если `amount < 0.001 ETH`, выходим без покупки.
-5. Покупка с лимитом влияния на цену 1% за вызов. Фаза берётся из `factory.getLaunchedToken(token).phase`.
-   - **До graduation (curve).** Чистый вход `net ≤ X · (√1.01 − 1) ≈ 0.4988% · X`, где `X` — quote-резерв из `curve.getReserves()`. Брутто = `net / (1 − 0.03)`. Вызов: `curve.buy{value: gross}(gross, minOut, address(hashMine))`, где `minOut` = ожидаемый выход по формуле curve × 0.995.
-   - **После graduation (Uniswap v4).** `poolManager.unlock`, в `unlockCallback` — `swap(key, zeroForOne = true, amountSpecified = −amount, sqrtPriceLimitX96 = sqrtP · √0.99)`. ETH — это `currency0`, токены забираются на `hashMine`. `PoolKey` собирается из `factory.getLaunchedToken(token)` (`poolFee`, `tickSpacing`) и адреса хука, в код не зашивается.
-   - **Между `graduate` и созданием пула** (graduation в PONS двухфазный) покупка пропускается, ETH ждёт следующего вызова.
-6. ETH, не влезший в лимит, остаётся до следующего вызова.
-7. Эмитит `Harvested(ethClaimed, ethSpent, tokensOut, phase)`.
+4. Весь `address(this).balance` переводится в `HashMine` низкоуровневым `call`; неудача — revert `TransferFailed`.
+5. Эмитит `Harvested(forwarded, phase)`.
 
-Наша покупка сама платит 3% комиссии, из них 2.7% возвращаются нам же. Утечка — 0.3% от объёма выкупа.
+Проверено форк-тестами против настоящего PONS (блок 62 704 000): покупка на 1 ETH → `harvest()` → ровно 0.027 ETH в `HashMine`; после graduation — комиссии продаж уходят без оператора, комиссии покупок (в токене) — после конвертации оператором.
 
-Про сэндвичи честно: `minOut`, посчитанный из того же состояния в той же транзакции, от сэндвича не защищает. Защищают другие вещи: у Robinhood Chain нет публичного мемпула (транзакции упорядочивает sequencer, по докам hashcats), выкуп ограничен 1% за вызов и не чаще раза в 12 с.
-
-### 4.3 Миграция получателя комиссий
+### 4.4 Миграция получателя комиссий
 
 Нужна, чтобы из-за бага в `HashMine` или `PonsTreasury` комиссии не уходили навсегда в сломанный контракт.
 
 - `proposeMigration(newRecipient)` — `onlyOwner`, выставляет `eta = now + 7 дней`.
-- `executeMigration()` — `onlyOwner`, работает в окне `[eta, eta + 3 дня]`, вызывает `factory.transferCreatorFeeRecipient(token, newRecipient)`.
+- `executeMigration()` — `onlyOwner`, работает в окне `[eta, eta + 3 дня]`, вызывает `factory.transferCreatorFeeRecipient(token, newRecipient)`. Требует `adopt`.
 - `cancelMigration()` — `onlyOwner`.
-- `renounceOwnership()` делает контракт полностью неизменяемым, миграция после этого невозможна.
-- Функций вывода ETH или токенов у владельца нет. ETH, оставшийся после миграции, по-прежнему можно потратить только через `harvest()` на выкуп в текущий `hashMine`.
+- `renounceOwnership()` делает контракт полностью неизменяемым.
 
 ## 5. HashMine
 
@@ -193,15 +186,15 @@ function submit(address beneficiary, uint256 round, uint8 difficulty, uint256[] 
 
 - Инвариант: незакрытым может быть только последний активный раунд.
 - **Закрытие раунда `k`** — при первой шаре более позднего раунда или при `claim`, если `k` уже кончился:
-  - `release = (balanceOf(this) − reserved) · RELEASE_BPS / 10000`;
+  - `release = (address(this).balance − reserved) · RELEASE_BPS / 10000` (пул — ETH, ревизия §4);
   - `rewardPerWork(k) = mulDiv(release, 1e36, work(k))`;
   - `reserved += release`;
   - эмитит `RoundClosed(k, work(k), release)`.
 - Пустые раунды ничего не выпускают, и пропущенные выпуски не копятся: после простоя первый активный раунд получает те же 0.48% пула.
 - **Расчёт майнера:** `claimable += mulDiv(miner.work, rewardPerWork(miner.round), 1e36)`.
-- **`claim(beneficiary)`** вызывает кто угодно, выплата идёт `beneficiary`. Шаги: закрыть раунд майнера, если он уже кончился (работа в ещё идущем раунде в эту выплату не входит); рассчитать майнера; перевести `claimable`; `reserved −= claimable`; эмитить `Claimed(beneficiary, amount)`.
+- **`claim(beneficiary)`** вызывает кто угодно, выплата идёт `beneficiary` низкоуровневым `call` с ETH; если получатель не принимает ETH — revert `TransferFailed`, ничего не теряется. Шаги: закрыть раунд майнера, если он уже кончился (работа в ещё идущем раунде в эту выплату не входит); рассчитать майнера; перевести `claimable`; `reserved −= claimable`; эмитить `Claimed(beneficiary, amount)`.
 - Пыль от округления навсегда остаётся в `reserved`. Это допустимо, инвариант: выплачено ≤ выпущено.
-- Других функций вывода токенов, кроме `claim`, нет. Владельца у `HashMine` нет.
+- Других функций вывода, кроме `claim`, нет. Владельца у `HashMine` нет. `receive()` принимает ETH от кого угодно — это и есть пополнение пула.
 
 ### 5.6 View для клиента
 
@@ -286,16 +279,9 @@ Testnet — публичный RPC. Mainnet — платный (Alchemy), клю
 
 ## 8. Выкладка
 
-1. **Testnet 46630.** `HashMine` + мок-токен; вместо harvest скрипт периодически переводит мок-токены на `HashMine`. Публичный тест майнинга с живыми кошельками.
-2. **Mainnet — только по явной команде «mainnet» и после карточки подтверждения.**
-   1. Деплой `PonsTreasury`. Owner — адрес команды; мультисиг, если Safe есть на Robinhood Chain (не проверено).
-   2. `launch()` с 0.0005 ETH.
-   3. Проверка ончейн:
-      - `totalSupply == 1e27`;
-      - `factory.getLaunchedToken(token)`: `creatorFeeRecipient == PonsTreasury`, `creatorTaxBps == 200`, `buybackEnabled == false`;
-      - `hashMine.token() == token`.
-   4. Сайт переключается на адреса mainnet.
-3. **До лаунча решить:** имя, тикер, лого и описание токена; адрес owner.
+1. **Testnet 46630.** `HashMine` с пулом в тестнетном ETH; вместо harvest — `TopUp.s.sol` переводит ETH на `HashMine`. Публичный тест майнинга с живыми кошельками.
+2. **Mainnet 4663 — только по явной команде «mainnet».** Порядок (ревизия §4): `DeployMainnet.s.sol` (HashMine + PonsTreasury, owner — кошелёк пользователя) → пользователь запускает токен на PONS (пара ETH, tax 2%, buyback off) → `transferCreatorFeeRecipient(token, treasury)` с кошелька → `adopt(token)` → проверка ончейн `getLaunchedToken(token).creatorFeeRecipient == treasury` → сайт переключается на mainnet-адреса (`VITE_CHAIN=mainnet`, `VITE_HASHMINE_ADDRESS`, `VITE_TREASURY_ADDRESS`, `VITE_FEE_ESCROW_ADDRESS`, `VITE_PONS_TOKEN`).
+3. Мейннет-деплой можно делать до запуска токена: `HashMine` больше не зависит от адреса токена.
 
 ## 9. Риски
 

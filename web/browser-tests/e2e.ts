@@ -1,7 +1,7 @@
 import type { Address, Hex } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { localAnvil } from '../src/chain/chains';
-import { ViemChainReader, ViemSubmitter, createClients, unknownPrice } from '../src/chain/hashMineChain';
+import { ViemChainReader, ViemSubmitter, createClients, ethReward } from '../src/chain/hashMineChain';
 import { CpuEngine } from '../src/engine/cpuEngine';
 import { GpuEngine } from '../src/engine/gpuEngine';
 import type { Engine } from '../src/engine/types';
@@ -43,7 +43,7 @@ async function run(config: E2EConfig): Promise<E2EResult> {
     engines,
     chain: new ViemChainReader(clients.publicClient, config.hashMine),
     submitter: new ViemSubmitter(clients, config.hashMine, account),
-    price: unknownPrice,
+    price: ethReward,
     flushBeforeEndSec: 8,
     log,
   });
