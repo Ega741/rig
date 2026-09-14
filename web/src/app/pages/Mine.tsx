@@ -80,7 +80,7 @@ export function Mine({ config }: { config: UiConfig }) {
       <p className="lead">
         Your browser hashes your address, the round challenge and a nonce until the result starts with enough zero bits. Each such hash is a
         share. When a round ends, the pool releases {s ? (s.releaseBps / 100).toFixed(2) : '0.48'}% of its ETH and splits it by work among
-        everyone who sent shares. The pool is the token's trading fees, forwarded as they come.
+        everyone who sent shares. The pool is 40% of the token's trading fees, forwarded as they come.
       </p>
 
       <section className={`panel frame ${miner.running ? 'frame--work' : 'frame--night'}`} aria-label="Your miner">

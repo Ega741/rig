@@ -23,11 +23,13 @@ abstract contract PonsForkBase is Test {
     IPonsCurve internal curve;
     address internal creator = makeAddr("creator");
     address internal trader = makeAddr("trader");
+    address internal team = makeAddr("team");
+    uint256 internal constant TEAM_BPS = 6000;
 
     function setUp() public virtual {
         vm.createSelectFork("robinhood", FORK_BLOCK);
         mine = new HashMine(HashMine.Params({roundLength: 600, releaseBps: 48, targetShares: 4096, minDifficulty: 20}));
-        treasury = new PonsTreasury(address(this), FACTORY, mine);
+        treasury = new PonsTreasury(address(this), FACTORY, mine, team, TEAM_BPS);
 
         vm.deal(creator, 1 ether);
         token = IERC20(_launch(creator, "Rig Test", "RIGT", keccak256("rig-fork-test")));

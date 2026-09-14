@@ -22,9 +22,10 @@ export function Docs({ config }: { config: UiConfig }) {
       </p>
       <h2>Where the ETH comes from</h2>
       <p>
-        Trading the token on PONS pays a 4% fee. The part that reaches the project, about 3.7% of every trade, is forwarded to the mining pool as
-        ETH, untouched: no buyback, no swap, no team cut. Anyone can trigger the forward with <code>harvest()</code>. The pool is exactly what the
-        fees and donations put there, and miners are the only ones who can take anything out.
+        Trading the token on PONS pays a 4% fee. The part that reaches the project, about 3.7% of every trade, lands in the treasury as ETH.
+        Every <code>harvest()</code> (anyone can call it) splits it by a ratio fixed in the contract at deployment: <strong>40% to the mining
+        pool, 60% to the team wallet</strong>. No buyback, no swap. The pool is exactly what the fees and donations put there, and miners are the
+        only ones who can take anything out of it.
       </p>
       <h2>Keys</h2>
       <p>

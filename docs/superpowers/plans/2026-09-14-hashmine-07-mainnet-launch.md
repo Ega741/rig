@@ -8,9 +8,10 @@ wallet transactions is one command.
 1. **Fund the mainnet deployer** `0x97D3dA2Df311a429954c2661B754dfC500F82B7C` with ~0.002 ETH on Robinhood Chain
    (gas ≈ 0.07 gwei; two contracts ≈ 0.0003 ETH). Key: `contracts/.env` → `MAINNET_DEPLOYER_KEY`.
 2. **Deploy** (`TREASURY_OWNER` = the deployer unless the user names a wallet; the owner can only `adopt` and
-   propose a 7-day-timelocked migration, it cannot withdraw):
+   propose a 7-day-timelocked migration, it cannot withdraw). `TEAM_WALLET` receives `TEAM_BPS` (6000 = 60 %) of
+   every harvest, the rest goes to HashMine; both are immutable. `HASHMINE_ADDRESS` reuses a deployed HashMine:
    ```bash
-   cd contracts && set -a && . ./.env && set +a && TREASURY_OWNER=$MAINNET_DEPLOYER_ADDRESS \
+   cd contracts && set -a && . ./.env && set +a && TREASURY_OWNER=$MAINNET_DEPLOYER_ADDRESS TEAM_WALLET=0x… TEAM_BPS=6000 \
      forge script script/DeployMainnet.s.sol:DeployMainnet --rpc-url robinhood_public --broadcast
    ```
    Record `HASHMINE`, `TREASURY` in `contracts/deployments-mainnet.json`.

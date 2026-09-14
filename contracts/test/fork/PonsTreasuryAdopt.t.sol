@@ -26,19 +26,19 @@ contract PonsTreasuryAdoptTest is PonsForkBase {
         address other = makeAddr("other");
         vm.deal(other, 1 ether);
         address otherToken = _launch(other, "Other", "OTH", keccak256("other-fork-test"));
-        PonsTreasury fresh = new PonsTreasury(address(this), FACTORY, mine);
+        PonsTreasury fresh = new PonsTreasury(address(this), FACTORY, mine, team, TEAM_BPS);
         vm.expectRevert(PonsTreasury.NotFeeRecipient.selector);
         fresh.adopt(otherToken);
     }
 
     function test_adopt_rejectsUnknownToken() public {
-        PonsTreasury fresh = new PonsTreasury(address(this), FACTORY, mine);
+        PonsTreasury fresh = new PonsTreasury(address(this), FACTORY, mine, team, TEAM_BPS);
         vm.expectRevert(PonsTreasury.NotFeeRecipient.selector);
         fresh.adopt(makeAddr("not-a-launch"));
     }
 
     function test_adopt_onlyOwner() public {
-        PonsTreasury fresh = new PonsTreasury(address(this), FACTORY, mine);
+        PonsTreasury fresh = new PonsTreasury(address(this), FACTORY, mine, team, TEAM_BPS);
         vm.prank(trader);
         vm.expectRevert(abi.encodeWithSignature("OwnableUnauthorizedAccount(address)", trader));
         fresh.adopt(address(token));

@@ -45,7 +45,7 @@ contract PonsTreasuryMigrationTest is PonsForkBase {
     }
 
     function test_migration_requiresAdoptedToken() public {
-        PonsTreasury fresh = new PonsTreasury(address(this), FACTORY, mine);
+        PonsTreasury fresh = new PonsTreasury(address(this), FACTORY, mine, team, TEAM_BPS);
         fresh.proposeMigration(nextRecipient);
         vm.warp(fresh.migrationEta());
         vm.expectRevert(PonsTreasury.NotAdopted.selector);

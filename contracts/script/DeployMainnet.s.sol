@@ -16,12 +16,20 @@ contract DeployMainnet is Script {
     function run() external {
         uint256 key = vm.envUint("MAINNET_DEPLOYER_KEY");
         address owner = vm.envAddress("TREASURY_OWNER");
+        address team = vm.envAddress("TEAM_WALLET");
+        uint256 teamBps = vm.envOr("TEAM_BPS", uint256(6000));
+        // HASHMINE_ADDRESS set: reuse the deployed HashMine and deploy only the treasury.
+        address existing = vm.envOr("HASHMINE_ADDRESS", address(0));
         vm.startBroadcast(key);
-        HashMine mine = new HashMine(HashMine.Params({roundLength: 600, releaseBps: 48, targetShares: 4096, minDifficulty: 20}));
-        PonsTreasury treasury = new PonsTreasury(owner, FACTORY, mine);
+        HashMine mine = existing == address(0)
+            ? new HashMine(HashMine.Params({roundLength: 600, releaseBps: 48, targetShares: 4096, minDifficulty: 20}))
+            : HashMine(payable(existing));
+        PonsTreasury treasury = new PonsTreasury(owner, FACTORY, mine, team, teamBps);
         vm.stopBroadcast();
         console2.log("HASHMINE", address(mine));
         console2.log("TREASURY", address(treasury));
+        console2.log("TEAM", team);
+        console2.log("TEAM_BPS", teamBps);
         console2.log("FEE_ESCROW", address(treasury.feeEscrow()));
         console2.log("OWNER", owner);
     }

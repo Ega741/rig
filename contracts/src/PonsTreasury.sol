@@ -12,13 +12,15 @@ import {HashMine} from "./HashMine.sol";
 import {IPonsFactory, IPonsCurve, IPonsMemeHook, IPonsFeeEscrow, PonsGraduationPhase} from "./interfaces/IPons.sol";
 
 /// @title PonsTreasury
-/// @notice Creator-fee recipient of a PONS V2 launch that forwards every wei it collects to HashMine, where
-/// miners split it by work. It buys nothing, swaps nothing and has no function that pays ETH to the owner;
-/// the fee stream can be handed to another contract only behind a 7-day timelock.
+/// @notice Creator-fee recipient of a PONS V2 launch. Every harvest splits what it collects by a fixed,
+/// immutable ratio: `teamBps` to the team wallet, the rest to HashMine, where miners split it by work.
+/// It buys nothing, swaps nothing and has no other function that pays ETH to anyone; the fee stream can be
+/// handed to another contract only behind a 7-day timelock.
 /// @dev Spec: docs/superpowers/specs/2026-09-14-hashmine-design.md, section 4.
 contract PonsTreasury is Ownable2Step, ReentrancyGuard {
     using PoolIdLibrary for PoolKey;
 
+    uint256 public constant BPS = 10_000;
     uint256 public constant MIGRATION_DELAY = 7 days;
     uint256 public constant MIGRATION_WINDOW = 3 days;
 
@@ -26,6 +28,10 @@ contract PonsTreasury is Ownable2Step, ReentrancyGuard {
     IPonsMemeHook public immutable memeHook;
     IPonsFeeEscrow public immutable feeEscrow;
     HashMine public immutable hashMine;
+    /// @notice Wallet that receives `teamBps` of every harvest; zero only when `teamBps` is zero.
+    address public immutable team;
+    /// @notice Share of every harvest that goes to `team`, in basis points. Fixed at deployment.
+    uint256 public immutable teamBps;
 
     address public token;
     address public curve;
@@ -34,12 +40,13 @@ contract PonsTreasury is Ownable2Step, ReentrancyGuard {
     uint256 public migrationEta;
 
     event Adopted(address indexed token, address indexed curve);
-    event Harvested(uint256 forwarded, PonsGraduationPhase phase);
+    event Harvested(uint256 toMiners, uint256 toTeam, PonsGraduationPhase phase);
     event MigrationProposed(address indexed newRecipient, uint256 eta);
     event MigrationCancelled(address indexed newRecipient);
     event MigrationExecuted(address indexed newRecipient);
 
     error ZeroAddress();
+    error BadTeamShare();
     error AlreadyAdopted();
     error NotAdopted();
     error NotFeeRecipient();
@@ -49,12 +56,17 @@ contract PonsTreasury is Ownable2Step, ReentrancyGuard {
     error MigrationNotReady(uint256 eta);
     error MigrationExpired(uint256 deadline);
 
-    constructor(address initialOwner, IPonsFactory factory_, HashMine hashMine_) Ownable(initialOwner) {
+    constructor(address initialOwner, IPonsFactory factory_, HashMine hashMine_, address team_, uint256 teamBps_)
+        Ownable(initialOwner)
+    {
         if (address(factory_) == address(0) || address(hashMine_) == address(0)) revert ZeroAddress();
+        if (teamBps_ > BPS || (teamBps_ != 0 && team_ == address(0))) revert BadTeamShare();
         factory = factory_;
         memeHook = IPonsMemeHook(factory_.memeHook());
         feeEscrow = IPonsFeeEscrow(factory_.feeEscrow());
         hashMine = hashMine_;
+        team = team_;
+        teamBps = teamBps_;
     }
 
     receive() external payable {}
@@ -71,9 +83,9 @@ contract PonsTreasury is Ownable2Step, ReentrancyGuard {
         emit Adopted(token_, launched.curve);
     }
 
-    /// @notice Pulls creator fees from PONS and forwards this contract's whole ETH balance to HashMine.
-    /// Callable by anyone.
-    function harvest() external nonReentrant returns (uint256 forwarded) {
+    /// @notice Pulls creator fees from PONS and splits this contract's whole ETH balance: `teamBps` to the
+    /// team wallet, the rest to HashMine. Callable by anyone.
+    function harvest() external nonReentrant returns (uint256 toMiners, uint256 toTeam) {
         address token_ = token;
         if (token_ == address(0)) revert NotAdopted();
         lastHarvestAt = block.timestamp;
@@ -87,12 +99,18 @@ contract PonsTreasury is Ownable2Step, ReentrancyGuard {
         }
         try feeEscrow.claim() {} catch {}
 
-        forwarded = address(this).balance;
-        if (forwarded != 0) {
-            (bool ok,) = address(hashMine).call{value: forwarded}("");
+        uint256 balance = address(this).balance;
+        toTeam = balance * teamBps / BPS;
+        toMiners = balance - toTeam;
+        if (toMiners != 0) {
+            (bool ok,) = address(hashMine).call{value: toMiners}("");
             if (!ok) revert TransferFailed();
         }
-        emit Harvested(forwarded, phase);
+        if (toTeam != 0) {
+            (bool ok,) = team.call{value: toTeam}("");
+            if (!ok) revert TransferFailed();
+        }
+        emit Harvested(toMiners, toTeam, phase);
     }
 
     /// @notice Starts the timelock for moving creator fees to `newRecipient`.

@@ -154,8 +154,8 @@ export function Token({ config }: { config: UiConfig }) {
               </div>
               <p className="status">
                 Claimable now is the fee recipient's balance in the PONS escrow, across every launch it receives fees from. On the curve and in the pool are fees charged but not yet swept; the pool's token-side
-                fees are converted to {unit} by the PONS operator and counted here at the current price. Everything here ends up in the mining pool
-                on the next harvest.
+                fees are converted to {unit} by the PONS operator and counted here at the current price. On the next harvest 40% of this goes to the mining pool and
+                60% to the team wallet, as fixed in the treasury contract.
               </p>
               {error && <p className="error status">{error}</p>}
             </div>

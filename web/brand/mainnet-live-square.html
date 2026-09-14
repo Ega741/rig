@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Jersey+10&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/app/pixel-frames.css">
+<style>
+:root{--bg:#07070a;--ink:#dee9fc;--ink-2:#b9c4dd;--ink-3:#6b7390;--panel:#1d1f26;--panel-2:#2b2d33;--frame:#3b3a45;--lime:#add064;--green:#65b24c;--cyan:#6fd3d5;--amber:#eabe57;--dot:#2b2d33}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'DotGothic16','Courier New',monospace}
+.card{position:relative;width:1080px;height:1080px;overflow:hidden;background-color:var(--bg);
+  background-image:radial-gradient(var(--dot) 2.2px,transparent 2.6px);background-size:48px 48px;background-position:24px 24px;
+  padding:52px 60px 48px;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center}
+.wordmark svg{height:48px;shape-rendering:crispEdges}
+.tag{font-family:'Jersey 10';font-size:26px;letter-spacing:3px;color:var(--ink-2);text-transform:uppercase;line-height:1}
+.tag b{color:var(--lime);font-weight:400}
+.live{display:inline-flex;align-items:center;gap:14px;margin-top:40px;font-family:'Jersey 10';font-size:34px;letter-spacing:4px;color:var(--lime);text-transform:uppercase}
+.live i{width:18px;height:18px;background:var(--lime);box-shadow:0 0 0 4px var(--bg),0 0 0 7px var(--lime)}
+h1{font-family:'Jersey 10';font-weight:400;text-transform:uppercase;font-size:92px;line-height:.92;margin:14px 0 30px;letter-spacing:1px}
+h1 em{font-style:normal;color:var(--lime)}
+.panel{background:var(--panel);padding:26px 40px 30px;display:flex;flex-direction:column;gap:18px}
+.head{display:flex;justify-content:space-between;font-family:'Jersey 10';font-size:28px;letter-spacing:3px;color:var(--ink-2);text-transform:uppercase;line-height:1}
+.head b{color:var(--amber);font-weight:400}
+.hash{font-family:'VT323','Courier New',monospace;font-size:27px;line-height:1;letter-spacing:1px;color:var(--ink-3);white-space:nowrap;overflow:hidden}
+.hash i{font-style:normal}
+.hash .z{color:var(--bg);background:var(--lime);padding:2px 1px 0;margin-right:2px}
+.kv{display:grid;grid-template-columns:130px 1fr;row-gap:12px;column-gap:24px;align-items:baseline;font-family:'VT323','Courier New',monospace;font-size:26px;line-height:1}
+.kv dt{font-family:'Jersey 10';font-size:24px;letter-spacing:3px;color:var(--ink-2);text-transform:uppercase}
+.kv dd{margin:0;color:var(--ink);letter-spacing:.5px;white-space:nowrap}
+.kv dd.t{color:var(--amber)}
+.foot{display:flex;flex-direction:column;gap:8px;margin-top:auto;font-size:20px;color:var(--ink-2);line-height:1.25;gap:24px}
+.foot b{color:var(--lime);font-weight:400}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top">
+    <div class="wordmark">{{WORDMARK}}</div>
+    <div class="tag">ROBINHOOD CHAIN · <b>MAINNET</b> · 4663</div>
+  </div>
+  <div class="live"><i></i> live</div>
+  <h1>Mainnet<br>is live.<br><em>Mine ETH in<br>your browser.</em></h1>
+  <section class="panel frame frame--night">
+    <div class="head"><span>Last share</span><span>round <b>1</b> · 10:00</span></div>
+    <div class="hash"><i class="z">0</i><i class="z">0</i><i class="z">0</i><i class="z">0</i><i class="z">0</i><i class="z">0</i><i class="z">0</i><i>c</i><i>7</i><i>e</i><i>1</i><i>f</i><i>4</i><i>a</i><i>9</i><i>2</i><i>b</i><i>6</i><i>d</i><i>3</i><i>e</i><i>5</i><i>8</i><i>f</i><i>1</i><i>a</i><i>7</i><i>c</i><i>0</i><i>d</i><i>9</i><i>4</i><i>e</i><i>2</i><i>b</i><i>8</i><i>f</i><i>3</i><i>6</i><i>a</i><i>5</i><i>c</i><i>1</i><i>d</i><i>7</i><i>e</i><i>0</i><i>9</i><i>b</i><i>4</i><i>f</i><i>2</i><i>a</i><i>8</i><i>6</i><i>c</i><i>3</i><i>d</i><i>5</i><i>e</i><i>9</i><i>1</i><i>f</i><i>7</i></div>
+    <dl class="kv">
+      <dt>$RIG</dt><dd class="t">0x1109c7ec30c93ff6e84af4c86ca6c6c1eef99b38</dd>
+      <dt>HashMine</dt><dd>0x6a0d11BB9a25690B2C149Eb33a49817979F649B4</dd>
+    </dl>
+  </section>
+  <div class="foot">
+    <span>no NFT · no presale · 4% trade fee · 40% of it → miners, in ETH</span>
+    <span><b>rig.fan</b> → Start</span>
+  </div>
+</div>
+</body>
+</html>

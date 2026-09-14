@@ -91,9 +91,9 @@
 
 ### 4.1 Роль
 
-`PonsTreasury` — получатель creator-fee токена. Он ничего не покупает и не свопит: всё, что пришло, уходит в `HashMine`. Функций вывода ETH или токенов у владельца нет.
+`PonsTreasury` — получатель creator-fee токена. Он ничего не покупает и не свопит: каждый `harvest()` делит собранное по неизменяемой пропорции `teamBps` (решение пользователя 2026-09-15: **60 % команде, 40 % в `HashMine`**). Функций вывода сверх этого у владельца нет.
 
-Конструктор: `(initialOwner, factory, hashMine)`. `memeHook` и `feeEscrow` читаются из фабрики.
+Конструктор: `(initialOwner, factory, hashMine, team, teamBps)`; `teamBps ≤ 10000`, при `teamBps > 0` нужен ненулевой `team`. `memeHook` и `feeEscrow` читаются из фабрики.
 
 ### 4.2 Привязка к токену: `adopt(token)`
 
@@ -111,10 +111,10 @@
 1. До graduation: `curve.sweepFees(0)` в `try/catch`.
 2. После graduation: `memeHook.sweepPoolFees(poolId, 0, 0)` в `try/catch`. Комиссии в самом токене конвертирует в ETH оператор PONS (замер в §2), после чего они появляются в escrow.
 3. `feeEscrow.claim()` в `try/catch`.
-4. Весь `address(this).balance` переводится в `HashMine` низкоуровневым `call`; неудача — revert `TransferFailed`.
-5. Эмитит `Harvested(forwarded, phase)`.
+4. `toTeam = balance · teamBps / 10000` уходит на `team`, остаток — в `HashMine`; оба перевода низкоуровневым `call`, неудача — revert `TransferFailed`.
+5. Эмитит `Harvested(toMiners, toTeam, phase)`.
 
-Проверено форк-тестами против настоящего PONS (блок 62 704 000): покупка на 1 ETH → `harvest()` → ровно 0.037 ETH в `HashMine` (tax 3%); после graduation — комиссии продаж уходят без оператора, комиссии покупок (в токене) — после конвертации оператором.
+Проверено форк-тестами против настоящего PONS (блок 62 704 000): покупка на 1 ETH → `harvest()` → 0.037 ETH: 0.0148 в `HashMine`, 0.0222 на кошелёк команды (tax 3%, split 40/60); после graduation — комиссии продаж уходят без оператора, комиссии покупок (в токене) — после конвертации оператором.
 
 ### 4.4 Миграция получателя комиссий
 

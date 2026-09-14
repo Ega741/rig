@@ -12,20 +12,20 @@
 
 # Rig (`$RIG`)
 
-**Mine ETH in the browser.** Open [rig.fan](https://rig.fan), press **Start**, and your GPU (WebGPU) or CPU (WASM) searches keccak shares for the current round. Every trade of `$RIG` pays a fee; the project's part goes straight into the mining pool as ETH, and every round splits the release between miners in proportion to work.
+**Mine ETH in the browser.** Open [rig.fan](https://rig.fan), press **Start**, and your GPU (WebGPU) or CPU (WASM) searches keccak shares for the current round. Every trade of `$RIG` pays a fee; 40 % of the project's part goes into the mining pool as ETH (60 % to the team, fixed in the contract), and every round splits the release between miners in proportion to work.
 
-No NFTs. No presale. No team allocation. Nothing to install.
+No NFTs. No presale. No team token allocation. Nothing to install.
 
 ## How it works
 
 ```
- trade $RIG ── 4 % fee ──▶ PONS 1 % + creator 3 % ──▶ PonsTreasury ── ETH ──▶ HashMine pool
-                                                                                    │
- browser miner ── keccak shares ──▶ HashMine ── round close ──▶ release ∝ work ◀────┘
+ trade $RIG ── 4 % fee ──▶ PONS 1 % + creator 3 % ──▶ PonsTreasury ──┬── 40 % ETH ──▶ HashMine pool
+                                                                      └── 60 % ETH ──▶ team wallet    │
+ browser miner ── keccak shares ──▶ HashMine ── round close ──▶ release ∝ work ◀──────────────────────┘
 ```
 
 1. **Fees.** Every trade pays 4 %: the PONS base fee (1 %) plus the creator tax (3 %). About 3.7 % of volume reaches the project, in ETH.
-2. **Forward, not buyback.** `PonsTreasury` is the token's creator-fee recipient. `harvest()` — anyone can call it — pulls the fees from PONS and sends every wei to `HashMine`. Nothing is swapped, nothing is kept: the pool's only inflow is fees (and donations).
+2. **Split, not buyback.** `PonsTreasury` is the token's creator-fee recipient. `harvest()` — anyone can call it — pulls the fees from PONS and splits them by a ratio fixed at deployment (`teamBps`, immutable): **40 % to `HashMine`, 60 % to the team wallet**. Nothing is swapped, nothing is kept in between: the pool's only inflow is its share of fees (and donations).
 3. **Rounds.** Every 600 s the pool releases 48 bps of its ETH to the round that just closed.
 4. **Shares.** A share is a nonce with `keccak256(beneficiary ‖ challenge ‖ nonce)` under the target. It is bound to your address, so nobody can submit your work as theirs. Reward = release × your work ÷ total work.
 5. **Session key.** The tab signs with a throwaway key that only pays gas. Rewards go to the beneficiary you chose.
@@ -42,9 +42,10 @@ No NFTs. No presale. No team allocation. Nothing to install.
 | | |
 |---|---|
 | Launch | [PONS](https://pons.fun) on Robinhood Chain |
-| Trade fee | 4 % (1 % PONS + 3 % creator) → ≈3.7 % of volume to the mining pool, in ETH |
-| Team / reserve | 0 |
-| Pool inflow | trading fees forwarded by `PonsTreasury.harvest()`; no buyback, no swap |
+| Trade fee | 4 % (1 % PONS + 3 % creator) → ≈3.7 % of volume to the treasury, in ETH |
+| Fee split | 40 % mining pool / 60 % team wallet — immutable in `PonsTreasury` |
+| Team token allocation / reserve | 0 |
+| Pool inflow | 40 % of trading fees via `PonsTreasury.harvest()`; no buyback, no swap |
 | Round | 600 s, releases 48 bps of the pool |
 | Rewards | ETH, proportional to work in the round |
 
@@ -52,7 +53,7 @@ No NFTs. No presale. No team allocation. Nothing to install.
 
 | Path | What |
 |---|---|
-| `contracts/` | Foundry: `HashMine.sol` (rounds, shares, ETH rewards), `PonsTreasury.sol` (creator-fee recipient: harvest → forward, timelocked migration) |
+| `contracts/` | Foundry: `HashMine.sol` (rounds, shares, ETH rewards), `PonsTreasury.sol` (creator-fee recipient: harvest → 40/60 split, timelocked migration) |
 | `miner-wasm/` | Rust → WASM keccak share search (CPU engine) |
 | `web/` | Vite + React miner: engines (WASM workers, WebGPU), controller, UI |
 | `sim/` | Parameter simulation (`sim/RESULTS.md`) |

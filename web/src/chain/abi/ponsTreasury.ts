@@ -17,6 +17,16 @@ export const ponsTreasuryAbi = [
         "name": "hashMine_",
         "type": "address",
         "internalType": "contract HashMine"
+      },
+      {
+        "name": "team_",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "teamBps_",
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "stateMutability": "nonpayable"
@@ -24,6 +34,19 @@ export const ponsTreasuryAbi = [
   {
     "type": "receive",
     "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "BPS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -130,7 +153,12 @@ export const ponsTreasuryAbi = [
     "inputs": [],
     "outputs": [
       {
-        "name": "forwarded",
+        "name": "toMiners",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "toTeam",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -250,6 +278,32 @@ export const ponsTreasuryAbi = [
   },
   {
     "type": "function",
+    "name": "team",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "teamBps",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "token",
     "inputs": [],
     "outputs": [
@@ -298,7 +352,13 @@ export const ponsTreasuryAbi = [
     "name": "Harvested",
     "inputs": [
       {
-        "name": "forwarded",
+        "name": "toMiners",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "toTeam",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
@@ -398,6 +458,11 @@ export const ponsTreasuryAbi = [
   {
     "type": "error",
     "name": "AlreadyAdopted",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "BadTeamShare",
     "inputs": []
   },
   {

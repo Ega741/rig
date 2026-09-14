@@ -84,8 +84,8 @@ export function App() {
         <div>
           <div className="label">Rig</div>
           <p>
-            Mine ETH in the browser. The token's trading fees flow into the pool; every round splits the release by work. No mint, no
-            reserve, no team share.
+            Mine ETH in the browser. 40% of the token's trading fees flow into the pool (60% to the team, fixed in the contract); every round
+            splits the release by work. No mint, no reserve.
           </p>
         </div>
         <div>
