@@ -77,9 +77,11 @@ export function App() {
           <a href="#/mine" aria-current={route === 'mine' ? 'page' : undefined}>
             Mine
           </a>
-          <a href="#/token" aria-current={route === 'token' ? 'page' : undefined}>
-            Token
-          </a>
+          {config.ponsToken && (
+            <a href="#/token" aria-current={route === 'token' ? 'page' : undefined}>
+              Token
+            </a>
+          )}
           <a href="#/stats" aria-current={route === 'stats' ? 'page' : undefined}>
             Stats
           </a>
@@ -107,7 +109,7 @@ export function App() {
         <div>
           <div className="label">Pages</div>
           <a href="#/mine">Mine</a>
-          <a href="#/token">Token</a>
+          {config.ponsToken && <a href="#/token">Token</a>}
           <a href="#/stats">Stats</a>
           <a href="#/docs">Docs</a>
         </div>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createPublicClient, formatUnits, getAddress, http, isAddress, type Address, type PublicClient } from 'viem';
+import { createPublicClient, formatUnits, http, type Address, type PublicClient } from 'viem';
 import { robinhood } from '../../chain/chains';
 import {
   PONS_FACTORY,
@@ -15,13 +15,7 @@ import {
 import type { UiConfig } from '../config';
 import { formatTokens, shortAddress } from '../format';
 
-const TOKEN_KEY = 'rig.ponsToken';
 const POLL_MS = 3000;
-
-function storedToken(): Address | null {
-  const value = localStorage.getItem(TOKEN_KEY);
-  return value && isAddress(value) ? getAddress(value) : null;
-}
 
 function quoteAmount(units: bigint, decimals: number, digits = 4): string {
   const value = Number(formatUnits(units, decimals));
@@ -35,8 +29,7 @@ function tokenPrice(unitsPerToken: bigint, decimals: number): string {
 }
 
 export function Token({ config }: { config: UiConfig }) {
-  const [token, setToken] = useState<Address | null>(() => config.ponsToken ?? storedToken());
-  const [input, setInput] = useState('');
+  const token: Address | null = config.ponsToken;
   const [snapshot, setSnapshot] = useState<PonsSnapshot | null>(null);
   const [history, setHistory] = useState<FeeHistory | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -50,15 +43,6 @@ export function Token({ config }: { config: UiConfig }) {
     if (!clientRef.current) clientRef.current = createPublicClient({ chain: robinhood, transport: http(config.ponsRpcUrl) });
     return clientRef.current;
   }, [config.ponsRpcUrl]);
-
-  const watch = (address: Address) => {
-    setToken(address);
-    localStorage.setItem(TOKEN_KEY, address);
-    setSnapshot(null);
-    setHistory(null);
-    historyRef.current = null;
-    setError(null);
-  };
 
   useEffect(() => {
     if (!token) return;
@@ -113,29 +97,8 @@ export function Token({ config }: { config: UiConfig }) {
           ? `${s.name} on PONS, ${phaseLabel}. Every trade pays ${(s.baseFeeBps + s.creatorTaxBps) / 100}%: ${s.creatorTaxBps / 100}% creator tax plus ${
               (100 - s.protocolFeeShareBps / 100) / 100
             } of the ${s.baseFeeBps / 100}% base fee reach the creator — ${((s.creatorTaxBps + (s.baseFeeBps * (10_000 - s.protocolFeeShareBps)) / 10_000) / 100).toFixed(2)}% of volume.`
-          : 'Paste the token contract address of a PONS launch on Robinhood Chain to watch its fees live.'}
+          : 'The token launches on PONS soon. Its fees, price and market will be live here from the first trade.'}
       </p>
-
-      {!config.ponsToken && (
-        <section className="panel frame frame--night" aria-label="Watch a token">
-          <div className="panel__title panel__title--dim">
-            <span>Watch</span>
-            <span>{token ? shortAddress(token) : 'no token yet'}</span>
-          </div>
-          <div className="panel__body">
-            <div className="field">
-              <label className="label" htmlFor="pons-token">
-                Token contract address
-              </label>
-              <input id="pons-token" type="text" placeholder="0x…" value={input} onChange={(e) => setInput(e.target.value)} />
-              <button type="button" className="btn frame frame--green" disabled={!isAddress(input)} onClick={() => watch(getAddress(input))}>
-                Watch
-              </button>
-            </div>
-            {error && <p className="error status">{error}</p>}
-          </div>
-        </section>
-      )}
 
       {token && (
         <>
