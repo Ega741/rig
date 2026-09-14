@@ -25,10 +25,11 @@ describe('SessionKey', () => {
     expect(SessionKey.load(storage)?.address).toBe(created.address);
   });
 
-  it('exports the private key and can be forgotten', () => {
+  it('never exposes the private key and can be forgotten', () => {
     const storage = new MemoryStorage();
     const key = SessionKey.loadOrCreate(storage);
-    expect(key.exportPrivateKey()).toBe(storage.getItem(SESSION_KEY_STORAGE_KEY));
+    expect(JSON.stringify(key)).not.toContain(storage.getItem(SESSION_KEY_STORAGE_KEY));
+    expect('exportPrivateKey' in key).toBe(false);
     SessionKey.forget(storage);
     expect(SessionKey.load(storage)).toBeNull();
   });

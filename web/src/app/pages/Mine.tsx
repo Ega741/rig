@@ -284,7 +284,7 @@ export function Mine({ config }: { config: UiConfig }) {
           </dl>
           <p className="status">
             The session key lives in this browser and only pays gas for submitting shares. Keep at least 0.005 ETH on it. It never receives
-            rewards.
+            rewards, and its private key is never shown. Forget it any time to get a fresh one.
           </p>
           <div className="actions">
             {provider ? (
@@ -299,9 +299,6 @@ export function Mine({ config }: { config: UiConfig }) {
             ) : (
               <span className="muted">No wallet extension found: send ETH to the session key address to pay for gas.</span>
             )}
-            <button type="button" className="btn btn--ghost frame frame--ghost" onClick={() => alert(miner.sessionKey.exportPrivateKey())}>
-              Show private key
-            </button>
             <button type="button" className="btn btn--ghost frame frame--ghost" onClick={miner.forgetKey} disabled={miner.running}>
               Forget key
             </button>

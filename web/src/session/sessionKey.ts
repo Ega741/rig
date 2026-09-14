@@ -12,12 +12,12 @@ export interface KeyStorage {
 
 /**
  * Browser-local key that only pays gas for submit/harvest. Rewards never go to it: work is credited to
- * the beneficiary bound inside every share hash.
+ * the beneficiary bound inside every share hash. The private key is never exposed outside this class.
  */
 export class SessionKey {
   readonly account: PrivateKeyAccount;
 
-  private constructor(private readonly privateKey: Hex) {
+  private constructor(privateKey: Hex) {
     this.account = privateKeyToAccount(privateKey);
   }
 
@@ -42,9 +42,5 @@ export class SessionKey {
 
   static forget(storage: KeyStorage): void {
     storage.removeItem(SESSION_KEY_STORAGE_KEY);
-  }
-
-  exportPrivateKey(): Hex {
-    return this.privateKey;
   }
 }
