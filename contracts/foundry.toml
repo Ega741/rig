@@ -1,0 +1,29 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.26"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 10000
+fs_permissions = [{ access = "read-write", path = "./vectors" }]
+remappings = [
+  "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+  "forge-std/=lib/forge-std/src/",
+  "@uniswap/v4-core/=lib/v4-core/",
+]
+
+[fuzz]
+runs = 256
+
+[invariant]
+runs = 64
+depth = 64
+fail_on_revert = false
+
+[rpc_endpoints]
+# Public RPC keeps only ~3-10k recent blocks of state (measured 2026-09-14), so pinned forks break.
+# drpc serves historical state.
+robinhood = "https://robinhood.drpc.org"
+robinhood_public = "https://rpc.mainnet.chain.robinhood.com"
+robinhood_testnet = "https://rpc.testnet.chain.robinhood.com"

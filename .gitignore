@@ -1,0 +1,10 @@
+contracts/out/
+contracts/cache/
+contracts/broadcast/*/31337/
+node_modules/
+miner-wasm/target/
+web/node_modules/
+web/dist/
+web/e2e-artifacts/
+.env
+.DS_Store
