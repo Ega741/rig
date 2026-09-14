@@ -1,6 +1,6 @@
 import type { Address, Hex } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { localAnvil } from '../src/chain/chains';
+import { localAnvil, robinhoodTestnet } from '../src/chain/chains';
 import { ViemChainReader, ViemSubmitter, createClients, ethReward } from '../src/chain/hashMineChain';
 import { CpuEngine } from '../src/engine/cpuEngine';
 import { GpuEngine } from '../src/engine/gpuEngine';
@@ -15,6 +15,8 @@ interface E2EConfig {
   cores: number;
   useGpu: boolean;
   seconds: number;
+  /** 46630 for the Robinhood Chain testnet; anything else means the local anvil. */
+  chainId?: number;
 }
 
 interface E2EResult {
@@ -32,7 +34,8 @@ function log(message: string): void {
 
 async function run(config: E2EConfig): Promise<E2EResult> {
   const account = privateKeyToAccount(config.sessionPrivateKey);
-  const clients = createClients({ ...localAnvil, rpcUrls: { default: { http: [config.rpcUrl] } } }, config.rpcUrl, account);
+  const base = config.chainId === robinhoodTestnet.id ? robinhoodTestnet : localAnvil;
+  const clients = createClients({ ...base, rpcUrls: { default: { http: [config.rpcUrl] } } }, config.rpcUrl, account);
   const engines: Engine[] = [new CpuEngine(config.cores)];
   if (config.useGpu) {
     const gpu = await GpuEngine.create();
