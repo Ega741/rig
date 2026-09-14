@@ -13,6 +13,8 @@ describe('loadConfig', () => {
     expect(c.beneficiary).toBeNull();
     expect(c.ponsToken).toBeNull();
     expect(c.ponsRpcUrl).toBe('https://rpc.mainnet.chain.robinhood.com');
+    expect(c.xUrl).toBeNull();
+    expect(loadConfig({ VITE_CHAIN: 'testnet', VITE_HASHMINE_ADDRESS: HASHMINE, VITE_X_URL: 'https://x.com/rigfan' }, '').xUrl).toBe('https://x.com/rigfan');
   });
 
   it('reads the PONS token from env or query', () => {

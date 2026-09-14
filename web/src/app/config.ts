@@ -9,6 +9,8 @@ export interface UiConfig extends AppConfig {
   ponsToken: Address | null;
   /** RPC for the PONS reads; always Robinhood Chain mainnet. */
   ponsRpcUrl: string;
+  /** Link to the project's X account (VITE_X_URL); null until it exists. */
+  xUrl: string | null;
 }
 
 function addressParam(value: string | null, name: string): Address | null {
@@ -38,5 +40,6 @@ export function loadConfig(env: Record<string, string | undefined>, search: stri
     beneficiary: addressParam(query.get('beneficiary'), 'beneficiary'),
     ponsToken: addressParam(query.get('token') ?? env.VITE_PONS_TOKEN ?? null, 'token'),
     ponsRpcUrl: query.get('ponsRpc') ?? env.VITE_PONS_RPC_URL ?? ROBINHOOD_RPC,
+    xUrl: env.VITE_X_URL?.startsWith('https://') ? env.VITE_X_URL : null,
   };
 }

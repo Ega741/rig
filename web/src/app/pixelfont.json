@@ -1,0 +1,14 @@
+{
+  "height": 7,
+  "gap": 1,
+  "glyphs": {
+    "R": ["XXXXX.", "XX..XX", "XX..XX", "XXXXX.", "XX.XX.", "XX..XX", "XX..XX"],
+    "I": ["XXXXXX", "..XX..", "..XX..", "..XX..", "..XX..", "..XX..", "XXXXXX"],
+    "G": [".XXXX.", "XX..XX", "XX....", "XX.XXX", "XX..XX", "XX..XX", ".XXXX."],
+    "F": ["XXXXXX", "XX....", "XX....", "XXXXX.", "XX....", "XX....", "XX...."],
+    "A": [".XXXX.", "XX..XX", "XX..XX", "XXXXXX", "XX..XX", "XX..XX", "XX..XX"],
+    "N": ["XX..XX", "XXX.XX", "XXXXXX", "XX.XXX", "XX..XX", "XX..XX", "XX..XX"],
+    ".": ["..", "..", "..", "..", "..", "XX", "XX"],
+    " ": ["...", "...", "...", "...", "...", "...", "..."]
+  }
+}

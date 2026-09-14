@@ -120,25 +120,16 @@ h2 {
   gap: 12px 24px;
   min-height: 72px;
   padding: 12px 24px;
+  background: radial-gradient(var(--panel-2) 1.5px, transparent 1.6px) 6px 6px / 12px 12px;
 }
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-family: var(--font-display);
-  font-size: 37px;
-  line-height: 1;
-  letter-spacing: 0.75px;
-  text-transform: uppercase;
   text-decoration: none;
-}
-.brand b {
-  font-weight: 400;
-  color: var(--lime);
+  line-height: 0;
 }
 .brand svg {
-  width: 36px;
-  height: 24px;
+  display: block;
 }
 .nav {
   display: flex;
@@ -535,7 +526,7 @@ input[type='range']::-moz-range-thumb {
   margin: 0 auto;
   padding: 30px 24px 48px;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 24px;
   color: var(--ink-2);
 }

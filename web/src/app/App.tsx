@@ -5,6 +5,7 @@ import { Docs } from './pages/Docs';
 import { Mine } from './pages/Mine';
 import { Stats } from './pages/Stats';
 import { Token } from './pages/Token';
+import { Wordmark } from './Wordmark';
 
 type Route = 'mine' | 'token' | 'stats' | 'docs';
 
@@ -21,24 +22,6 @@ function useHashRoute(): Route {
     return () => window.removeEventListener('hashchange', onChange);
   }, []);
   return route;
-}
-
-/** 12x8 pixel graphics card: bracket, board, two fans. */
-function CardIcon() {
-  const px = (x: number, y: number, w = 1, h = 1, fill = 'var(--lime)') => (
-    <rect key={`${x}-${y}-${w}-${h}-${fill}`} x={x} y={y} width={w} height={h} fill={fill} />
-  );
-  return (
-    <svg viewBox="0 0 12 8" aria-hidden="true" shapeRendering="crispEdges">
-      {px(0, 0, 2, 8, 'var(--ink-2)')}
-      {px(2, 1, 10, 6)}
-      {px(3, 2, 3, 4, 'var(--bg)')}
-      {px(7, 2, 3, 4, 'var(--bg)')}
-      {px(4, 3, 1, 2)}
-      {px(8, 3, 1, 2)}
-      {px(2, 7, 10, 1, 'var(--green)')}
-    </svg>
-  );
 }
 
 export function App() {
@@ -67,11 +50,8 @@ export function App() {
   return (
     <>
       <header className="top">
-        <a className="brand" href="#/mine">
-          <CardIcon />
-          <span>
-            <b>Rig</b>
-          </span>
+        <a className="brand" href="#/mine" aria-label="Rig">
+          <Wordmark height={26} />
         </a>
         <nav className="nav" aria-label="Pages">
           <a href="#/mine" aria-current={route === 'mine' ? 'page' : undefined}>
@@ -123,7 +103,20 @@ export function App() {
               Treasury {shortAddress(config.treasury)}
             </div>
           )}
-          <div className="muted">{config.chain.name}</div>
+          <div className="muted">Robinhood Chain Mainnet</div>
+        </div>
+        <div>
+          <div className="label">Elsewhere</div>
+          {config.xUrl ? (
+            <a href={config.xUrl} target="_blank" rel="noreferrer">
+              X
+            </a>
+          ) : (
+            <span className="muted">X · soon</span>
+          )}
+          <a href="https://github.com/Ega741/rig" target="_blank" rel="noreferrer">
+            GitHub
+          </a>
         </div>
       </footer>
     </>
