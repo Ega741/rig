@@ -39,10 +39,19 @@ for (const m of miners) {
   console.log(`  miner ${m.beneficiary} session ${m.session} funded (${hash})`);
 }
 
-const vite = await createServer({ configFile: `${ROOT}web/vite.config.ts`, root: `${ROOT}web`, server: { port: 0 }, logLevel: 'error' });
+// No dependency discovery: it would re-optimise and reload every page mid-run.
+const vite = await createServer({ configFile: `${ROOT}web/vite.config.ts`, root: `${ROOT}web`, server: { port: 0 }, logLevel: 'error', optimizeDeps: { noDiscovery: true, include: [] } });
 await vite.listen();
 const url = vite.resolvedUrls.local[0];
 const browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ['--headless=new', '--enable-unsafe-webgpu', '--use-angle=metal'] });
+// Warm the module graph once so the miners' pages load without surprises.
+{
+  const warm = await browser.newPage();
+  await warm.goto(`${url}browser-tests/e2e.html`);
+  await warm.waitForFunction(() => typeof window.rigE2E === 'object');
+  await warm.waitForTimeout(5000);
+  await warm.close();
+}
 const started = Date.now();
 const runs = miners.map(async (m, i) => {
   const page = await browser.newPage();
@@ -53,16 +62,19 @@ const runs = miners.map(async (m, i) => {
     await page.goto(`${url}browser-tests/e2e.html`);
     await page.waitForFunction(() => typeof window.rigE2E === 'object');
     // Vite may reload the page once right after the first load (dependency optimisation); run again then.
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(5000);
+    const progress = setInterval(() => void page.evaluate(() => document.getElementById('log')?.textContent?.trim().split('\n').pop() ?? '').then((line) => console.log(`[miner ${i} ${Math.round((Date.now() - started) / 1000)}s] ${line}`)).catch(() => {}), 120_000);
     try {
       result = await page.evaluate((c) => window.rigE2E.run(c), config);
+      clearInterval(progress);
       break;
     } catch (error) {
-      if (attempt >= 3 || !String(error).includes('Execution context was destroyed')) throw error;
+      clearInterval(progress);
+      if (attempt >= 6 || !String(error).includes('Execution context was destroyed')) throw error;
       console.log(`[miner ${i}] page reloaded under us, retrying (${attempt})`);
     }
   }
-  console.log(`--- miner ${i} (${m.beneficiary}) after ${Math.round((Date.now() - started) / 1000)} s:\n${result.log.slice(-4).join('\n')}\nclaim tx: ${result.claimTx}`);
+  console.log(`--- miner ${i} (${m.beneficiary}) after ${Math.round((Date.now() - started) / 1000)} s:\n${result.log.slice(-15).join('\n')}\nclaim tx: ${result.claimTx}`);
   return result;
 });
 const results = await Promise.all(runs);
