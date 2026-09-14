@@ -1,15 +1,16 @@
+import { idleRatio } from './types';
 import { loadKeccakWasm, type KeccakWasm } from './wasm';
 
 /** Messages from CpuEngine. bigint travels as decimal strings: structured clone supports bigint, but strings keep DevTools readable. */
 export type CpuWorkerIn =
-  | { type: 'start'; header: Uint8Array; segment: string; worker: number; difficulty: number }
-  | { type: 'update'; header: Uint8Array; segment: string; difficulty: number }
+  | { type: 'start'; header: Uint8Array; segment: string; worker: number; difficulty: number; intensity: number }
+  | { type: 'update'; header: Uint8Array; segment: string; difficulty: number; intensity: number }
   | { type: 'stop' };
 
 export type CpuWorkerOut =
   | { type: 'ready' }
   | { type: 'hit'; segment: string; worker: number; counter: string; difficulty: number }
-  | { type: 'rate'; hashes: number; ms: number }
+  | { type: 'rate'; hashes: number; ms: number; busyMs: number }
   | { type: 'error'; message: string };
 
 const CHUNK = 1 << 16;
@@ -25,6 +26,7 @@ let running = false;
 let workerId = 0n;
 let segment = 0n;
 let difficulty = 0;
+let intensity = 100;
 let counter = 0n;
 let generation = 0;
 let header: Uint8Array = new Uint8Array(52);
@@ -44,9 +46,13 @@ function yieldToEventLoop(): Promise<void> {
 
 async function loop(myGeneration: number): Promise<void> {
   let hashes = 0;
+  let busyMs = 0;
   let since = performance.now();
   while (running && myGeneration === generation && wasm) {
+    const chunkStart = performance.now();
     const found = wasm.search(segment, workerId, counter, CHUNK, difficulty);
+    const chunkMs = performance.now() - chunkStart;
+    busyMs += chunkMs;
     if (found === null) {
       hashes += CHUNK;
       counter += BigInt(CHUNK);
@@ -57,12 +63,16 @@ async function loop(myGeneration: number): Promise<void> {
     }
     const now = performance.now();
     if (now - since >= REPORT_MS) {
-      ctx.postMessage({ type: 'rate', hashes, ms: now - since });
+      ctx.postMessage({ type: 'rate', hashes, ms: now - since, busyMs });
       hashes = 0;
+      busyMs = 0;
       since = now;
     }
+    // Duty cycle: rest in proportion to the time just spent hashing, so the core stays under the cap.
+    const rest = chunkMs * idleRatio(intensity);
+    if (rest >= 1) await new Promise<void>((resolve) => setTimeout(resolve, rest));
     // Yield so 'update'/'stop' messages get through between chunks (~12 ms each at 5 MH/s).
-    await yieldToEventLoop();
+    else await yieldToEventLoop();
   }
 }
 
@@ -75,6 +85,7 @@ ctx.onmessage = async (event) => {
       header = msg.header;
       segment = BigInt(msg.segment);
       difficulty = msg.difficulty;
+      intensity = msg.intensity;
       counter = 0n;
       wasm.setHeader(header);
       running = true;
@@ -86,6 +97,7 @@ ctx.onmessage = async (event) => {
       header = msg.header;
       segment = newSegment;
       difficulty = msg.difficulty;
+      intensity = msg.intensity;
       wasm?.setHeader(header);
     } else if (msg.type === 'stop') {
       running = false;

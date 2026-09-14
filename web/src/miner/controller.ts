@@ -1,5 +1,5 @@
 import type { Address, Hex } from 'viem';
-import { headerBytes, isValidShare, makeNonce } from '../engine/share';
+import { headerBytes, leadingZeroBits, makeNonce, shareHash } from '../engine/share';
 import type { Engine, Hit } from '../engine/types';
 import {
   PROFIT_MARGIN,
@@ -10,6 +10,15 @@ import {
   submitGas,
   valuePerHashWei,
 } from './policy';
+
+/** The browser miner never takes more than half of the machine: engines idle at least as long as they work. */
+export const MAX_INTENSITY = 50;
+export const MIN_INTENSITY = 10;
+
+export function clampIntensity(value: number): number {
+  if (!Number.isFinite(value)) return MAX_INTENSITY;
+  return Math.min(MAX_INTENSITY, Math.max(MIN_INTENSITY, Math.round(value)));
+}
 
 export interface RoundState {
   round: bigint;
@@ -54,12 +63,14 @@ export interface ControllerOptions {
   flushBeforeEndSec?: number;
   /** Difficulty used until the engines report a hash rate, so a fast GPU does not flood cheap shares. 0 disables. */
   warmupDifficulty?: number;
+  /** Engine duty cycle in percent, clamped to MAX_INTENSITY. */
+  intensity?: number;
   log?: (message: string) => void;
 }
 
 export type MinerEvent =
   | { type: 'round'; at: number; round: bigint }
-  | { type: 'hit'; at: number; difficulty: number }
+  | { type: 'hit'; at: number; difficulty: number; hash: Hex; bits: number }
   | { type: 'submit'; at: number; count: number; tx: Hex };
 
 export interface Snapshot {
@@ -100,6 +111,7 @@ export class MinerController {
   private readonly now: () => number;
   private readonly flushBeforeEndSec: number;
   private readonly warmupDifficulty: number;
+  private intensity: number;
   private readonly log: (message: string) => void;
 
   private state: RoundState | null = null;
@@ -132,6 +144,7 @@ export class MinerController {
     this.now = options.now ?? (() => Date.now());
     this.flushBeforeEndSec = options.flushBeforeEndSec ?? 20;
     this.warmupDifficulty = options.warmupDifficulty ?? 24;
+    this.intensity = clampIntensity(options.intensity ?? MAX_INTENSITY);
     this.log = options.log ?? (() => {});
     for (const engine of this.engines) engine.onHit = (hit) => this.handleHit(engine, hit);
   }
@@ -155,6 +168,17 @@ export class MinerController {
   /** Resolves once queued hit handling and flushes are done (tests). */
   idle(): Promise<void> {
     return this.pendingWork;
+  }
+
+  /** Changes the duty cycle of running engines at once; clamped to [MIN_INTENSITY, MAX_INTENSITY]. */
+  setIntensity(value: number): number {
+    this.intensity = clampIntensity(value);
+    this.configureEngines();
+    return this.intensity;
+  }
+
+  getIntensity(): number {
+    return this.intensity;
   }
 
   snapshot(): Snapshot {
@@ -281,7 +305,7 @@ export class MinerController {
     if (this.active.size === 0) {
       for (const engine of this.engines) {
         if (this.engineErrors.some((e) => e.startsWith(engine.name))) continue;
-        engine.start({ header: this.header, segment: this.segment, difficulty: this.difficulty });
+        engine.start({ header: this.header, segment: this.segment, difficulty: this.difficulty, intensity: this.intensity });
         this.active.add(engine);
       }
     } else {
@@ -292,7 +316,7 @@ export class MinerController {
 
   private configureEngines(): void {
     if (!this.header) return;
-    for (const engine of this.active) engine.update({ header: this.header, segment: this.segment, difficulty: this.difficulty });
+    for (const engine of this.active) engine.update({ header: this.header, segment: this.segment, difficulty: this.difficulty, intensity: this.intensity });
   }
 
   private pickDifficulty(): number {
@@ -321,7 +345,9 @@ export class MinerController {
     if (!state || !this.active.has(engine)) return;
     if (hit.segment !== this.segment) return; // superseded by a flush or a new round
     const nonce = makeNonce(hit.segment, hit.worker, hit.counter);
-    if (!isValidShare(this.beneficiary, state.challenge, nonce, hit.difficulty)) {
+    const hash = shareHash(this.beneficiary, state.challenge, nonce);
+    const bits = leadingZeroBits(hash);
+    if (bits < hit.difficulty) {
       engine.stop();
       this.active.delete(engine);
       this.engineErrors.push(`${engine.name}: reported an invalid share, engine disabled`);
@@ -331,7 +357,7 @@ export class MinerController {
     this.hitsFound += 1;
     this.buffer.push(hit);
     this.ownWork += 1n << BigInt(hit.difficulty);
-    this.onEvent?.({ type: 'hit', at: this.now(), difficulty: hit.difficulty });
+    this.onEvent?.({ type: 'hit', at: this.now(), difficulty: hit.difficulty, hash, bits });
     if (this.buffer.length >= 64) void this.flush();
   }
 }

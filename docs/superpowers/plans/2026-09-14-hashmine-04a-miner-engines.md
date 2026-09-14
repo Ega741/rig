@@ -122,7 +122,7 @@ contract Vectors is Script {
 
 - [ ] **Step 3: Сгенерировать и проверить**
 
-Run: `cd ~/Desktop/hashmine/contracts && mkdir -p vectors && forge script script/Vectors.s.sol:Vectors && python3 -c "import json; v=json.load(open('vectors/share-vectors.json')); print(len(v), 'vectors;', 'min lz of last 4:', min(x['leadingZeroBits'] for x in v[8:]))"`
+Run: `cd ~/Desktop/rig/contracts && mkdir -p vectors && forge script script/Vectors.s.sol:Vectors && python3 -c "import json; v=json.load(open('vectors/share-vectors.json')); print(len(v), 'vectors;', 'min lz of last 4:', min(x['leadingZeroBits'] for x in v[8:]))"`
 Expected: `12 vectors; min lz of last 4: 12` или больше.
 
 - [ ] **Step 4: Checkpoint** — `git status --short`.
@@ -278,7 +278,7 @@ ls -la "$ROOT/web/src/engine/wasm/hashmine_keccak.wasm"
 
 - [ ] **Step 5: Собрать**
 
-Run: `chmod +x ~/Desktop/hashmine/scripts/build-wasm.sh && ~/Desktop/hashmine/scripts/build-wasm.sh`
+Run: `chmod +x ~/Desktop/rig/scripts/build-wasm.sh && ~/Desktop/rig/scripts/build-wasm.sh`
 Expected: `Finished release`, файл ~3.2 КБ в `web/src/engine/wasm/`, без предупреждений `unused_unsafe`.
 
 - [ ] **Step 6: Checkpoint** — `git status --short`.
@@ -387,7 +387,7 @@ export default defineConfig({
 
 - [ ] **Step 6: Установить зависимости**
 
-Run: `cd ~/Desktop/hashmine/web && npm install 2>&1 | tail -3`
+Run: `cd ~/Desktop/rig/web && npm install 2>&1 | tail -3`
 Expected: `added N packages`, без `ERESOLVE`.
 
 - [ ] **Step 7: Записать `web/src/engine/types.ts`**
@@ -479,7 +479,7 @@ describe('share reference (viem)', () => {
 
 - [ ] **Step 9: Убедиться, что падает**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/engine/__tests__/share.test.ts 2>&1 | tail -5`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/engine/__tests__/share.test.ts 2>&1 | tail -5`
 Expected: FAIL — `Failed to resolve import "../share"`.
 
 - [ ] **Step 10: Записать `web/src/engine/share.ts`**
@@ -531,7 +531,7 @@ export function bytesToHashHex(bytes: Uint8Array): Hex {
 
 - [ ] **Step 11: Прогнать**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/engine/__tests__/share.test.ts 2>&1 | tail -6 && npm run typecheck`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/engine/__tests__/share.test.ts 2>&1 | tail -6 && npm run typecheck`
 Expected: `Tests  16 passed` (12 параметризованных + 4), typecheck без ошибок.
 
 - [ ] **Step 12: Checkpoint** — `git status --short`.
@@ -597,7 +597,7 @@ describe('keccak wasm', () => {
 
 - [ ] **Step 2: Убедиться, что падает**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/engine/__tests__/wasm.test.ts 2>&1 | tail -5`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/engine/__tests__/wasm.test.ts 2>&1 | tail -5`
 Expected: FAIL — `Failed to resolve import "../wasm"`.
 
 - [ ] **Step 3: Записать `web/src/engine/wasm.ts`**
@@ -650,7 +650,7 @@ export async function loadKeccakWasm(): Promise<KeccakWasm> {
 
 - [ ] **Step 4: Прогнать**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run 2>&1 | tail -6`
+Run: `cd ~/Desktop/rig/web && npx vitest run 2>&1 | tail -6`
 Expected: `Tests  32 passed` (share 16 + wasm 16).
 
 - [ ] **Step 5: Checkpoint** — `git status --short`.
@@ -825,7 +825,7 @@ export class CpuEngine implements Engine {
 
 - [ ] **Step 3: Typecheck**
 
-Run: `cd ~/Desktop/hashmine/web && npm run typecheck`
+Run: `cd ~/Desktop/rig/web && npm run typecheck`
 Expected: без ошибок.
 
 - [ ] **Step 4: Checkpoint** — `git status --short`.
@@ -1153,7 +1153,7 @@ function sameBytes(a: Uint8Array, b: Uint8Array): boolean {
 
 - [ ] **Step 3: Typecheck**
 
-Run: `cd ~/Desktop/hashmine/web && npm run typecheck`
+Run: `cd ~/Desktop/rig/web && npm run typecheck`
 Expected: без ошибок. Если `adapter.info` не типизирован в `@webgpu/types` 0.1.72 — заменить на `(adapter as unknown as { info: GPUAdapterInfo }).info`.
 
 - [ ] **Step 4: Checkpoint** — `git status --short`.
@@ -1258,16 +1258,16 @@ window.hashmineTest = { gpu, cpu };
 
 ```js
 // Runs browser-tests/ in headless Chromium against the Vite dev server. Exit code 1 on any failure.
-// HASHMINE_CHROME overrides the browser binary (default: the cached Chromium 1243 with WebGPU on Metal).
+// RIG_CHROME overrides the browser binary (default: the cached Chromium 1243 with WebGPU on Metal).
 import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { chromium } from 'playwright-core';
 import { createServer } from 'vite';
 
 const CHROME =
-  process.env.HASHMINE_CHROME ??
+  process.env.RIG_CHROME ??
   `${homedir()}/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`;
-const CORES = Number(process.env.HASHMINE_TEST_CORES ?? 2);
+const CORES = Number(process.env.RIG_TEST_CORES ?? 2);
 const failures = [];
 const check = (ok, label) => {
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${label}`);
@@ -1275,7 +1275,7 @@ const check = (ok, label) => {
 };
 
 if (!existsSync(CHROME)) {
-  console.log(`FAIL browser binary not found: ${CHROME} (set HASHMINE_CHROME)`);
+  console.log(`FAIL browser binary not found: ${CHROME} (set RIG_CHROME)`);
   process.exit(1);
 }
 
@@ -1320,12 +1320,12 @@ console.log('\nall browser tests passed');
 
 - [ ] **Step 4: Прогнать браузерные тесты**
 
-Run: `cd ~/Desktop/hashmine/web && npm run test:browser`
+Run: `cd ~/Desktop/rig/web && npm run test:browser`
 Expected: все строки `ok`, в конце `all browser tests passed`. Ориентиры: GPU ≥ 100 MH/s на Apple Metal, CPU ≈ 4–5 MH/s на ядро; при D=16 за 3 с GPU даёт сотни находок, CPU на 2 ядрах — ~600.
 
 - [ ] **Step 5: Полный прогон и сборка**
 
-Run: `cd ~/Desktop/hashmine/web && npm test 2>&1 | tail -4 && npm run build 2>&1 | tail -6`
+Run: `cd ~/Desktop/rig/web && npm test 2>&1 | tail -4 && npm run build 2>&1 | tail -6`
 Expected: vitest `32 passed`; `vite build` без ошибок, в `dist/assets/` есть `.wasm` и воркер.
 
 - [ ] **Step 6: Checkpoint** — `git status --short`.

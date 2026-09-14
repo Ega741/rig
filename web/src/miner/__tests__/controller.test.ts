@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getAddress, keccak256, toHex, type Address, type Hex } from 'viem';
 import { isValidShare, makeNonce, splitNonce } from '../../engine/share';
 import type { Engine, EngineConfig, Hit } from '../../engine/types';
-import { MinerController, type ChainReader, type PriceSource, type RoundState, type Submitter } from '../controller';
+import { MAX_INTENSITY, MinerController, type ChainReader, type PriceSource, type RoundState, type Submitter } from '../controller';
 
 const BENEFICIARY = getAddress('0x1111111111111111111111111111111111111111') as Address;
 
@@ -25,6 +25,9 @@ class FakeEngine implements Engine {
   }
   hashRate(): number {
     return this.rate;
+  }
+  dutyCycle(): number {
+    return 0;
   }
   /** Emits a real share of the configured difficulty (brute force; difficulty is tiny in tests). */
   emitValid(challenge: Hex, worker = 0n): Hit {
@@ -85,7 +88,7 @@ function state(round: bigint, now: number): RoundState {
   };
 }
 
-function setup(now = 1_000_000, options: { warmupDifficulty?: number } = {}) {
+function setup(now = 1_000_000, options: { warmupDifficulty?: number; intensity?: number } = {}) {
   const engine = new FakeEngine();
   const chain = new FakeChain(state(1n, now));
   const submitter = new FakeSubmitter();
@@ -99,6 +102,7 @@ function setup(now = 1_000_000, options: { warmupDifficulty?: number } = {}) {
     now: () => clock,
     flushBeforeEndSec: 20,
     warmupDifficulty: options.warmupDifficulty ?? 0,
+    intensity: options.intensity,
   });
   return { engine, chain, submitter, controller, advance: (sec: number) => (clock += sec * 1000) };
 }
@@ -232,6 +236,17 @@ describe('MinerController', () => {
     expect(order).toEqual(['submit', 'claim']);
   });
 
+  it('caps engine intensity at 50% and applies changes live', async () => {
+    const { engine, controller } = setup(1_000_000, { intensity: 100 });
+    await controller.tick();
+    expect(MAX_INTENSITY).toBe(50);
+    expect(engine.config?.intensity).toBe(50);
+    expect(controller.setIntensity(30)).toBe(30);
+    expect(engine.config?.intensity).toBe(30);
+    expect(controller.setIntensity(5)).toBe(10);
+    expect(controller.setIntensity(Number.NaN)).toBe(50);
+  });
+
   it('claim goes through the submitter and stop stops engines', async () => {
     const { engine, submitter, controller } = setup();
     await controller.tick();
@@ -245,7 +260,11 @@ describe('MinerController', () => {
     const { engine, chain, controller, advance } = setup();
     engine.rate = 0;
     const events: string[] = [];
-    controller.onEvent = (event) => events.push(event.type);
+    let hitBits = 0;
+    controller.onEvent = (event) => {
+      events.push(event.type);
+      if (event.type === 'hit') hitBits = event.bits;
+    };
     await controller.tick();
     engine.emitValid(chain.state.challenge);
     await controller.flush();
@@ -255,6 +274,7 @@ describe('MinerController', () => {
     expect(s.releaseBps).toBe(48);
     expect(s.ownWork).toBe(1n << 4n);
     expect(events).toEqual(['round', 'hit', 'submit']);
+    expect(hitBits).toBeGreaterThanOrEqual(4);
     advance(600);
     chain.state = state(2n, 1_000_000 - 600);
     await controller.tick();

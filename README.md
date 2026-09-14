@@ -1,4 +1,6 @@
-# hashmine
+# Rig
+
+Project name: **Rig** (`$RIG`), chosen 2026-09-14. The working name `hashmine` survives in the share-pool contract `HashMine.sol`, the spec/plan file names and the WASM crate.
 
 Browser GPU/CPU mining of a PONS-launched token on Robinhood Chain. No NFTs, no team allocation: trading fees buy the token back into a mining pool, and shares of keccak proof-of-work split every round's release by work.
 
@@ -38,7 +40,7 @@ cd web && npm run dev           # local dev server; pass ?chain=local&rpc=…&ha
 cd sim && python3 hashmine_sim.py --seed 1
 ```
 
-Browser tests need the cached Chromium 1243 (`~/Library/Caches/ms-playwright/chromium-1243`) or `HASHMINE_CHROME=<path>`; WebGPU on Metal is required for the GPU checks.
+Browser tests need the cached Chromium 1243 (`~/Library/Caches/ms-playwright/chromium-1243`) or `RIG_CHROME=<path>`; WebGPU on Metal is required for the GPU checks.
 
 ## Configuration (web)
 

@@ -1,5 +1,5 @@
 // End-to-end: anvil -> DeployLocal -> fund a session key -> mine in headless Chromium -> check chain state.
-// Env: HASHMINE_CHROME (browser binary), E2E_SECONDS (default 75), E2E_CORES (default 2), E2E_GPU (default 1).
+// Env: RIG_CHROME (browser binary), E2E_SECONDS (default 75), E2E_CORES (default 2), E2E_GPU (default 1).
 import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { chromium } from 'playwright-core';
@@ -9,7 +9,7 @@ import { createServer } from 'vite';
 import { startLocalChain } from './lib/localChain.mjs';
 
 const CHROME =
-  process.env.HASHMINE_CHROME ??
+  process.env.RIG_CHROME ??
   `${homedir()}/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`;
 const SECONDS = Number(process.env.E2E_SECONDS ?? 75);
 const CORES = Number(process.env.E2E_CORES ?? 2);
@@ -44,9 +44,9 @@ try {
   const page = await browser.newPage();
   page.on('pageerror', (error) => console.log('[pageerror]', error.message));
   await page.goto(`${url}browser-tests/e2e.html`);
-  await page.waitForFunction(() => typeof window.hashmineE2E === 'object');
+  await page.waitForFunction(() => typeof window.rigE2E === 'object');
   const result = await page.evaluate(
-    (config) => window.hashmineE2E.run(config),
+    (config) => window.rigE2E.run(config),
     { rpcUrl, hashMine, sessionPrivateKey: sessionKey, beneficiary, cores: CORES, useGpu: USE_GPU, seconds: SECONDS },
   );
   console.log(result.log.slice(-12).join('\n'));

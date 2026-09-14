@@ -1,5 +1,5 @@
 // UI end-to-end: the real Mine page against anvil. Starts mining, waits for shares on screen and on chain,
-// opens Stats, saves screenshots to e2e-artifacts/. Env: HASHMINE_CHROME, E2E_UI_TIMEOUT (default 120 s).
+// opens Stats, saves screenshots to e2e-artifacts/. Env: RIG_CHROME, E2E_UI_TIMEOUT (default 120 s).
 import { existsSync, mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { chromium } from 'playwright-core';
@@ -9,7 +9,7 @@ import { createServer } from 'vite';
 import { startLocalChain } from './lib/localChain.mjs';
 
 const CHROME =
-  process.env.HASHMINE_CHROME ??
+  process.env.RIG_CHROME ??
   `${homedir()}/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`;
 const TIMEOUT_MS = Number(process.env.E2E_UI_TIMEOUT ?? 120) * 1000;
 const ARTIFACTS = 'e2e-artifacts';
@@ -49,14 +49,18 @@ try {
   check(true, 'session balance shows 0.5000 ETH');
   check((await page.getByTestId('beneficiary').textContent()).trim() === beneficiary, 'beneficiary from the URL is shown');
 
-  await page.getByLabel('CPU cores').fill('2');
+  await page.getByLabel('CPU cores').evaluate((el) => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, '2');
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  });
   await page.getByTestId('start-button').click();
   await page.waitForFunction(() => /MH\/s|kH\/s/.test(document.querySelector('[data-testid="hash-rate"]').textContent), null, { timeout: 30_000 });
   console.log('hash rate:', (await page.getByTestId('hash-rate').textContent()).trim());
   await page.waitForFunction(() => Number.parseInt(document.querySelector('[data-testid="shares-sent"]').textContent, 10) > 0, null, { timeout: TIMEOUT_MS });
   const sent = Number.parseInt((await page.getByTestId('shares-sent').textContent()).trim(), 10);
   check(sent > 0, `shares sent on screen: ${sent}`);
-  check((await page.locator('.bar__mark').count()) > 0, 'round bar shows share marks');
+  check((await page.locator('.strip__mark').count()) > 0, 'round strip shows share marks');
+  check((await page.locator('.hashstrip__bit--lead').count()) >= 8, 'hash strip lights the leading zero bits of the last share');
   await page.screenshot({ path: `${ARTIFACTS}/mine.png`, fullPage: true });
   await page.setViewportSize({ width: 400, height: 800 });
   await page.waitForTimeout(500);
@@ -85,7 +89,8 @@ try {
   await page.screenshot({ path: `${ARTIFACTS}/stats.png`, fullPage: true });
 
   await page.goto(`${url}?${query.toString()}#/docs`);
-  check((await page.locator('h1').textContent()).includes('How mining works'), 'docs page renders');
+  check((await page.locator('h1').textContent()).includes('How it works'), 'docs page renders');
+  await page.screenshot({ path: `${ARTIFACTS}/docs.png`, fullPage: true });
 } finally {
   if (browser) await browser.close();
   if (vite) await vite.close();

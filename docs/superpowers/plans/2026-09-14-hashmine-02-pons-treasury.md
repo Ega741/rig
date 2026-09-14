@@ -139,7 +139,7 @@ interface IPonsFeeEscrow {
 
 - [ ] **Step 3: Сборка**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge build`
+Run: `cd ~/Desktop/rig/contracts && forge build`
 Expected: `Compiler run successful`.
 
 - [ ] **Step 4: Checkpoint** — `git status --short`.
@@ -287,7 +287,7 @@ contract PonsTreasuryLaunchTest is PonsForkBase {
 
 - [ ] **Step 3: Убедиться, что падает**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-path 'test/fork/*'`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-path 'test/fork/*'`
 Expected: FAIL компиляции — `Source "../../src/PonsTreasury.sol" not found`.
 
 - [ ] **Step 4: Записать `contracts/src/PonsTreasury.sol` (запуск)**
@@ -389,7 +389,7 @@ contract PonsTreasury is Ownable2Step, ReentrancyGuard {
 
 - [ ] **Step 5: Прогнать форк-тесты запуска**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-path 'test/fork/PonsTreasuryLaunch.t.sol' -vv`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-path 'test/fork/PonsTreasuryLaunch.t.sol' -vv`
 Expected: `5 passed; 0 failed`. Первый прогон долгий (минуты, RPC-кэш), повторный — секунды.
 
 - [ ] **Step 6: Checkpoint** — `git status --short`.
@@ -459,7 +459,7 @@ contract PonsTreasuryHarvestTest is PonsForkBase {
 
 - [ ] **Step 2: Убедиться, что падает**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-path 'test/fork/PonsTreasuryHarvest.t.sol'`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-path 'test/fork/PonsTreasuryHarvest.t.sol'`
 Expected: FAIL компиляции — `Member "harvest" not found`.
 
 - [ ] **Step 3: Добавить harvest (curve) в `PonsTreasury.sol`**
@@ -550,7 +550,7 @@ import {IPonsFactory, IPonsCurve, IPonsMemeHook, IPonsFeeEscrow, PonsGraduationP
 
 - [ ] **Step 4: Прогнать**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-path 'test/fork/PonsTreasury*.t.sol' -vv`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-path 'test/fork/PonsTreasury*.t.sol' -vv`
 Expected: Launch 5 + Harvest 4 = `9 passed; 0 failed`.
 
 - [ ] **Step 5: Checkpoint** — `git status --short`.
@@ -714,7 +714,7 @@ import {PoolSwapper} from "./PoolSwapper.sol";
 
 - [ ] **Step 3: Убедиться, что падают**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-path 'test/fork/PonsTreasuryHarvest.t.sol' -vv`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-path 'test/fork/PonsTreasuryHarvest.t.sol' -vv`
 Expected: 3 новых теста FAIL (`graduation-era fees spent` / `memecoin tax stays pending` / escrow-проверки): harvest ещё не покупает в пуле и не свипает хук.
 
 - [ ] **Step 4: Добавить в `PonsTreasury.sol` путь пула**
@@ -810,7 +810,7 @@ import {StateLibrary} from "@uniswap/v4-core/src/libraries/StateLibrary.sol";
 
 - [ ] **Step 5: Прогнать**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-path 'test/fork/PonsTreasury*.t.sol' -vv`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-path 'test/fork/PonsTreasury*.t.sol' -vv`
 Expected: Launch 5 + Harvest 7 = `12 passed; 0 failed`.
 
 - [ ] **Step 6: Checkpoint** — `git status --short`.
@@ -881,7 +881,7 @@ contract PonsTreasuryMigrationTest is PonsForkBase {
 
 - [ ] **Step 2: Убедиться, что падает**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-path 'test/fork/PonsTreasuryMigration.t.sol'`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-path 'test/fork/PonsTreasuryMigration.t.sol'`
 Expected: FAIL компиляции — `Member "proposeMigration" not found`.
 
 - [ ] **Step 3: Добавить миграцию в `PonsTreasury.sol`**
@@ -947,7 +947,7 @@ Expected: FAIL компиляции — `Member "proposeMigration" not found`.
 
 - [ ] **Step 4: Прогнать**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-path 'test/fork/*' -vv`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-path 'test/fork/*' -vv`
 Expected: Launch 5 + Harvest 7 + Migration 5 = `17 passed; 0 failed`.
 
 - [ ] **Step 5: Checkpoint** — `git status --short`.
@@ -958,12 +958,12 @@ Expected: Launch 5 + Harvest 7 + Migration 5 = `17 passed; 0 failed`.
 
 - [ ] **Step 1: Размер**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge build --sizes | grep -E "PonsTreasury|HashMine"`
+Run: `cd ~/Desktop/rig/contracts && forge build --sizes | grep -E "PonsTreasury|HashMine"`
 Expected: `PonsTreasury` Runtime Size < 24,576 B (EIP-170). Если больше — вынести создание `HashMine` в отдельную фабрику (спека §4.1) отдельной задачей.
 
 - [ ] **Step 2: Юнит + форк**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --no-match-path 'test/fork/*' && forge test --match-path 'test/fork/*'`
+Run: `cd ~/Desktop/rig/contracts && forge test --no-match-path 'test/fork/*' && forge test --match-path 'test/fork/*'`
 Expected: юнит `37 passed`, форк `17 passed`, 0 failed.
 
 - [ ] **Step 3: Checkpoint** — `git status --short`.

@@ -65,7 +65,7 @@ async function run(config: E2EConfig): Promise<E2EResult> {
 
 declare global {
   interface Window {
-    hashmineE2E: { run: typeof run };
+    rigE2E: { run: typeof run };
   }
 }
-window.hashmineE2E = { run };
+window.rigE2E = { run };

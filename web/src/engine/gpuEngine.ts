@@ -1,5 +1,5 @@
 import { BLOCK_WORDS, blockWords, keccakShaderSource } from './keccakWgsl';
-import { GPU_WORKER_ID, type Engine, type EngineConfig, type Hit } from './types';
+import { GPU_WORKER_ID, idleRatio, type Engine, type EngineConfig, type Hit } from './types';
 
 const WORKGROUP_SIZE = 256;
 const MAX_HITS = 1024;
@@ -26,6 +26,10 @@ export class GpuEngine implements Engine {
   private base = 0n;
   private dispatchSize = 1 << 20;
   private rate = 0;
+  private duty = 0;
+  private windowBusy = 0;
+  private windowWall = 0;
+  private windowStart = 0;
 
   private readonly paramsBuffer: GPUBuffer;
   private readonly blockBuffer: GPUBuffer;
@@ -89,10 +93,16 @@ export class GpuEngine implements Engine {
 
   stop(): void {
     this.running = false;
+    this.windowStart = 0;
+    this.windowBusy = 0;
   }
 
   hashRate(): number {
     return this.running ? this.rate : 0;
+  }
+
+  dutyCycle(): number {
+    return this.running ? this.duty : 0;
   }
 
   /** Hash of one nonce, for cross-implementation tests. Not used while mining. */
@@ -107,6 +117,7 @@ export class GpuEngine implements Engine {
         const { header, segment, difficulty } = this.config;
         const base = this.base;
         const count = this.dispatchSize;
+        const cycleStart = performance.now();
         const result = await this.dispatch(blockWords(header, segment, GPU_WORKER_ID), base, count, difficulty, 0);
         // A config change during the dispatch restarted the counter space; drop these hits.
         if (this.config.segment === segment && sameBytes(this.config.header, header)) {
@@ -116,9 +127,24 @@ export class GpuEngine implements Engine {
             this.onHit?.({ segment, worker: GPU_WORKER_ID, counter, difficulty });
           }
         }
-        this.rate = (count * 1000) / result.ms;
         if (result.ms < TARGET_MS / 2 && this.dispatchSize < MAX_DISPATCH) this.dispatchSize *= 2;
         else if (result.ms > TARGET_MS * 2 && this.dispatchSize > MIN_DISPATCH) this.dispatchSize /= 2;
+        // Duty cycle: rest in proportion to the whole busy cycle (dispatch + readback), so the GPU share of
+        // wall time stays below the cap; the reported rate covers the whole cycle.
+        const busy = performance.now() - cycleStart;
+        const rest = busy * idleRatio(this.config.intensity);
+        if (rest >= 1) await new Promise<void>((resolve) => setTimeout(resolve, rest));
+        const cycle = performance.now() - cycleStart;
+        this.rate = (count * 1000) / cycle;
+        // Duty measured over ~1 s windows of real wall time, including the rests.
+        if (this.windowStart === 0) this.windowStart = cycleStart;
+        this.windowBusy += busy;
+        this.windowWall = performance.now() - this.windowStart;
+        if (this.windowWall >= 1000) {
+          this.duty = Math.min(1, this.windowBusy / this.windowWall);
+          this.windowBusy = 0;
+          this.windowStart = performance.now();
+        }
       }
     } catch (error) {
       this.running = false;

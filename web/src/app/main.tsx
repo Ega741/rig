@@ -1,6 +1,6 @@
-import '@fontsource-variable/bricolage-grotesque';
-import '@fontsource-variable/instrument-sans';
-import '@fontsource-variable/jetbrains-mono';
+import '@fontsource/dotgothic16';
+import '@fontsource/jersey-10';
+import '@fontsource/vt323';
 import './styles.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

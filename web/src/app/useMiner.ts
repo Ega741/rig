@@ -1,16 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { Address } from 'viem';
+import type { Address, Hex } from 'viem';
 import { ViemChainReader, ViemHarvester, ViemSubmitter, createClients, unknownPrice, type ChainClients } from '../chain/hashMineChain';
 import { CpuEngine } from '../engine/cpuEngine';
 import { GpuEngine } from '../engine/gpuEngine';
 import type { Engine } from '../engine/types';
-import { MinerController, type MinerEvent, type Snapshot } from '../miner/controller';
+import { MAX_INTENSITY, MinerController, clampIntensity, type MinerEvent, type Snapshot } from '../miner/controller';
 import { SessionKey } from '../session/sessionKey';
 import type { UiConfig } from './config';
 
 export interface MinerSettings {
   cores: number;
   useGpu: boolean;
+  /** Duty cycle in percent; the controller caps it at MAX_INTENSITY. */
+  intensity: number;
+}
+
+/** At most half of the machine's cores. */
+export function maxCores(): number {
+  return Math.max(1, Math.floor((navigator.hardwareConcurrency || 4) / 2));
 }
 
 export interface Mark {
@@ -18,18 +25,20 @@ export interface Mark {
   kind: 'hit' | 'submit';
 }
 
-const SETTINGS_KEY = 'hashmine.settings';
+const SETTINGS_KEY = 'rig.settings';
 const HARVEST_CHECK_MS = 30_000;
 
 function defaultSettings(): MinerSettings {
-  const cores = Math.max(1, (navigator.hardwareConcurrency || 4) - 1);
-  return { cores, useGpu: true };
+  return { cores: maxCores(), useGpu: true, intensity: MAX_INTENSITY };
 }
 
 function loadSettings(): MinerSettings {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    if (raw) return { ...defaultSettings(), ...(JSON.parse(raw) as Partial<MinerSettings>) };
+    if (raw) {
+      const merged = { ...defaultSettings(), ...(JSON.parse(raw) as Partial<MinerSettings>) };
+      return { ...merged, cores: Math.min(merged.cores, maxCores()), intensity: clampIntensity(merged.intensity) };
+    }
   } catch {
     /* ignore a corrupted value */
   }
@@ -43,6 +52,7 @@ export function useMiner(config: UiConfig, beneficiary: Address | null) {
   const [running, setRunning] = useState(false);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [marks, setMarks] = useState<Mark[]>([]);
+  const [lastShare, setLastShare] = useState<{ hash: Hex; bits: number } | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [sessionBalance, setSessionBalance] = useState<bigint | null>(null);
   const [gpuName, setGpuName] = useState<string | null>(null);
@@ -53,8 +63,10 @@ export function useMiner(config: UiConfig, beneficiary: Address | null) {
   const harvesterRef = useRef<ViemHarvester | null>(null);
 
   const setSettings = useCallback((next: MinerSettings) => {
-    setSettingsState(next);
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+    const clamped = { ...next, cores: Math.min(Math.max(0, next.cores), maxCores()), intensity: clampIntensity(next.intensity) };
+    setSettingsState(clamped);
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(clamped));
+    controllerRef.current?.setIntensity(clamped.intensity);
   }, []);
 
   const refreshBalance = useCallback(async () => {
@@ -110,11 +122,13 @@ export function useMiner(config: UiConfig, beneficiary: Address | null) {
       chain: new ViemChainReader(clients.publicClient, config.hashMine),
       submitter: new ViemSubmitter(clients, config.hashMine, sessionKey.account),
       price: unknownPrice,
+      intensity: settings.intensity,
     });
     controller.onSnapshot = (s) => setSnapshot(s);
     controller.onEvent = (event: MinerEvent) => {
       if (event.type === 'round') setMarks([]);
       else setMarks((m) => [...m.slice(-400), { at: event.at, kind: event.type }]);
+      if (event.type === 'hit') setLastShare({ hash: event.hash, bits: event.bits });
     };
     enginesRef.current = engines;
     controllerRef.current = controller;
@@ -163,6 +177,7 @@ export function useMiner(config: UiConfig, beneficiary: Address | null) {
     running,
     snapshot,
     marks,
+    lastShare,
     status,
     start,
     stop,

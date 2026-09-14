@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
 - [ ] **Step 2: Убедиться, что падает**
 
-Run: `cd ~/Desktop/hashmine/sim && python3 -m unittest test_hashmine_sim -v`
+Run: `cd ~/Desktop/rig/sim && python3 -m unittest test_hashmine_sim -v`
 Expected: `ModuleNotFoundError: No module named 'hashmine_sim'`.
 
 - [ ] **Step 3: Записать `sim/hashmine_sim.py`**
@@ -337,7 +337,7 @@ if __name__ == "__main__":
 
 - [ ] **Step 4: Прогнать тесты**
 
-Run: `cd ~/Desktop/hashmine/sim && python3 -m unittest test_hashmine_sim -v`
+Run: `cd ~/Desktop/rig/sim && python3 -m unittest test_hashmine_sim -v`
 Expected: `Ran 7 tests ... OK`.
 
 - [ ] **Step 5: Checkpoint** — `git status --short`.
@@ -351,12 +351,12 @@ Expected: `Ran 7 tests ... OK`.
 
 - [ ] **Step 1: Прогнать**
 
-Run: `cd ~/Desktop/hashmine/sim && time python3 hashmine_sim.py --seed 1 --json results.json`
+Run: `cd ~/Desktop/rig/sim && time python3 hashmine_sim.py --seed 1 --json results.json`
 Expected: четыре таблицы markdown, файл `results.json`, время < 5 мин.
 
 - [ ] **Step 2: Проверить устойчивость к seed**
 
-Run: `cd ~/Desktop/hashmine/sim && python3 hashmine_sim.py --seed 2 --json results_seed2.json > /dev/null && python3 -c "import json;a=json.load(open('results.json'));b=json.load(open('results_seed2.json'));[print(x['scenario'],g['name'],round(g['reward_share_pct'],1),round(h['reward_share_pct'],1)) for x,y in zip(a,b) for g,h in zip(x['groups'],y['groups'])]"`
+Run: `cd ~/Desktop/rig/sim && python3 hashmine_sim.py --seed 2 --json results_seed2.json > /dev/null && python3 -c "import json;a=json.load(open('results.json'));b=json.load(open('results_seed2.json'));[print(x['scenario'],g['name'],round(g['reward_share_pct'],1),round(h['reward_share_pct'],1)) for x,y in zip(a,b) for g,h in zip(x['groups'],y['groups'])]"`
 Expected: доли наград по группам между seed 1 и 2 отличаются не больше чем на 1–2 п.п.
 
 - [ ] **Step 3: Записать `sim/RESULTS.md`**

@@ -146,7 +146,7 @@ export function configFromEnv(env: Record<string, string | undefined>): AppConfi
 
 - [ ] **Step 5: Сгенерировать ABI и проверить типы**
 
-Run: `chmod +x ~/Desktop/hashmine/scripts/export-abi.sh && cd ~/Desktop/hashmine/web && npm run abi && npm run typecheck`
+Run: `chmod +x ~/Desktop/rig/scripts/export-abi.sh && cd ~/Desktop/rig/web && npm run abi && npm run typecheck`
 Expected: два файла `wrote …/hashMine.ts`, `wrote …/ponsTreasury.ts`; typecheck без ошибок.
 
 - [ ] **Step 6: Checkpoint** — `git status --short`.
@@ -206,7 +206,7 @@ describe('SessionKey', () => {
 
 - [ ] **Step 2: Убедиться, что падает**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/session 2>&1 | tail -4`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/session 2>&1 | tail -4`
 Expected: FAIL — `Cannot find module '../sessionKey'`.
 
 - [ ] **Step 3: Записать `web/src/session/sessionKey.ts`**
@@ -266,7 +266,7 @@ export class SessionKey {
 
 - [ ] **Step 4: Прогнать**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/session 2>&1 | tail -4`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/session 2>&1 | tail -4`
 Expected: `3 passed`.
 
 - [ ] **Step 5: Checkpoint** — `git status --short`.
@@ -371,7 +371,7 @@ describe('buildBatches', () => {
 
 - [ ] **Step 2: Убедиться, что падает**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/miner 2>&1 | tail -4`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/miner 2>&1 | tail -4`
 Expected: FAIL — `Cannot find module '../policy'`.
 
 - [ ] **Step 3: Записать `web/src/miner/policy.ts`**
@@ -502,7 +502,7 @@ export function buildBatches(hits: Hit[]): Batch[] {
 
 - [ ] **Step 4: Прогнать**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/miner 2>&1 | tail -4`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/miner 2>&1 | tail -4`
 Expected: `10 passed`.
 
 - [ ] **Step 5: Checkpoint** — `git status --short`.
@@ -719,7 +719,7 @@ describe('MinerController', () => {
 
 - [ ] **Step 2: Убедиться, что падает**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/miner/__tests__/controller.test.ts 2>&1 | tail -4`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/miner/__tests__/controller.test.ts 2>&1 | tail -4`
 Expected: FAIL — `Cannot find module '../controller'`.
 
 - [ ] **Step 3: Записать `web/src/miner/controller.ts`**
@@ -1016,7 +1016,7 @@ export class MinerController {
 
 - [ ] **Step 4: Прогнать**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run 2>&1 | tail -5 && npm run typecheck`
+Run: `cd ~/Desktop/rig/web && npx vitest run 2>&1 | tail -5 && npm run typecheck`
 Expected: `Tests  51 passed` (31 + 3 + 10 + 7), typecheck чистый.
 
 - [ ] **Step 5: Checkpoint** — `git status --short`.
@@ -1198,7 +1198,7 @@ export const unknownPrice: PriceSource = { weiPerToken: async () => null };
 
 - [ ] **Step 2: Typecheck**
 
-Run: `cd ~/Desktop/hashmine/web && npm run typecheck`
+Run: `cd ~/Desktop/rig/web && npm run typecheck`
 Expected: без ошибок. Если viem ругается на типы `readMany`, привести аргументы через `as never` в местах вызова, не отключая strict.
 
 - [ ] **Step 3: Checkpoint** — `git status --short`.
@@ -1335,7 +1335,7 @@ window.hashmineE2E = { run };
 
 ```js
 // End-to-end: anvil -> DeployLocal -> fund a session key -> mine in headless Chromium -> check chain state.
-// Env: HASHMINE_CHROME (browser binary), E2E_SECONDS (default 75), E2E_CORES (default 2), E2E_GPU (default 1).
+// Env: RIG_CHROME (browser binary), E2E_SECONDS (default 75), E2E_CORES (default 2), E2E_GPU (default 1).
 import { spawn, execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { createServer as createNetServer } from 'node:net';
@@ -1348,7 +1348,7 @@ import { createServer } from 'vite';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const CHROME =
-  process.env.HASHMINE_CHROME ??
+  process.env.RIG_CHROME ??
   `${homedir()}/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`;
 const SECONDS = Number(process.env.E2E_SECONDS ?? 75);
 const CORES = Number(process.env.E2E_CORES ?? 2);
@@ -1452,12 +1452,12 @@ console.log('\ne2e passed');
 
 - [ ] **Step 6: Прогнать e2e**
 
-Run: `cd ~/Desktop/hashmine/web && npm run test:e2e`
+Run: `cd ~/Desktop/rig/web && npm run test:e2e`
 Expected: раунды по 30 с; за 75 с ≥ 2 закрытых раунда, ≥ 1 батч, `ShareBatch` на чейне равен `sharesSubmitted`, claim > 0, в конце `e2e passed`. Если `claim` вернул 0 (последний активный раунд ещё не закрыт), проверить, что `RoundClosed` есть хотя бы один — награда первого раунда должна быть выплачена.
 
 - [ ] **Step 7: Полный прогон**
 
-Run: `cd ~/Desktop/hashmine/web && npm test 2>&1 | tail -4 && npm run typecheck && npm run test:browser 2>&1 | tail -2 && npm run build 2>&1 | tail -3`
+Run: `cd ~/Desktop/rig/web && npm test 2>&1 | tail -4 && npm run typecheck && npm run test:browser 2>&1 | tail -2 && npm run build 2>&1 | tail -3`
 Expected: vitest `51 passed`; typecheck чистый; браузерные тесты `all browser tests passed`; сборка без ошибок.
 
 - [ ] **Step 8: Checkpoint** — `git status --short`.

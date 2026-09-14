@@ -1,7 +1,7 @@
 import { isHex, type Address, type Hex } from 'viem';
 import { generatePrivateKey, privateKeyToAccount, type PrivateKeyAccount } from 'viem/accounts';
 
-export const SESSION_KEY_STORAGE_KEY = 'hashmine.sessionKey';
+export const SESSION_KEY_STORAGE_KEY = 'rig.sessionKey';
 
 /** The subset of Storage the session key needs; localStorage in the browser, a Map in tests. */
 export interface KeyStorage {

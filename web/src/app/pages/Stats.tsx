@@ -37,56 +37,71 @@ export function Stats({ config }: { config: UiConfig }) {
 
   return (
     <>
-      <div className="grid">
-        <section className="card" aria-label="Miners">
-          <div className="big" data-testid="unique-miners">
-            {summary ? summary.miners : '—'}
-            <small>
-              {summary?.miners === 1 ? 'miner' : 'miners'} in the last {BLOCK_SPAN.toLocaleString('en-US')} blocks
-            </small>
+      <h1>Stats</h1>
+      <p className="lead">Who mined, how much work each round carried and what it released. Everything here is read from the contract.</p>
+
+      <section className="panel frame frame--night" aria-label="Miners">
+        <div className="panel__title panel__title--cyan">
+          <span>Miners</span>
+          <span>last {BLOCK_SPAN.toLocaleString('en-US')} blocks</span>
+        </div>
+        <div className="panel__body">
+          <div className="stat">
+            <span className="label">{summary?.miners === 1 ? 'Unique miner' : 'Unique miners'}</span>
+            <span className="num num--big" data-testid="unique-miners">
+              {summary ? summary.miners : '—'}
+            </span>
           </div>
-          <dl className="kv">
-            <dt>Shares</dt>
-            <dd>{summary ? summary.shares : '—'}</dd>
-            <dt>Batches</dt>
-            <dd>{summary ? summary.batches : '—'}</dd>
-          </dl>
-        </section>
-        <section className="card">
-          <p className="muted">A miner counts once per window, however many shares it sent. Rounds without a single share release nothing and do not catch up later.</p>
+          <div className="stats">
+            <div className="stat">
+              <span className="label">Shares</span>
+              <span className="num">{summary ? summary.shares : '—'}</span>
+            </div>
+            <div className="stat">
+              <span className="label">Batches</span>
+              <span className="num">{summary ? summary.batches : '—'}</span>
+            </div>
+          </div>
+          <p className="status">A miner counts once per window, however many shares it sent. Rounds without a single share release nothing and do not catch up later.</p>
           <div className="actions">
-            <button className="btn btn--ghost" onClick={() => void refresh()} disabled={loading}>
+            <button type="button" className="btn btn--ghost frame frame--ghost" onClick={() => void refresh()} disabled={loading}>
               {loading ? 'Loading…' : 'Refresh'}
             </button>
           </div>
           {error && <p className="error status">{error}</p>}
-        </section>
-      </div>
-      <section className="card" style={{ marginTop: 24 }} aria-label="Rounds">
-        <h2>Last {ROUNDS} rounds</h2>
-        <div className="table-wrap">
-          <table className="table" data-testid="rounds-table">
-            <thead>
-              <tr>
-                <th>Round</th>
-                <th>Minimum</th>
-                <th>Work</th>
-                <th>Released</th>
-                <th>State</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(rounds ?? []).map((r) => (
-                <tr key={r.round.toString()}>
-                  <td>{r.round.toString()}</td>
-                  <td>{r.active ? `${r.minDifficulty} bits` : '—'}</td>
-                  <td>{r.active ? formatWorkBits(r.work) : '—'}</td>
-                  <td>{r.closed ? formatTokens(r.release) : '—'}</td>
-                  <td>{r.closed ? 'closed' : r.active ? 'open' : 'empty'}</td>
+        </div>
+      </section>
+
+      <section className="panel frame frame--night" aria-label="Rounds">
+        <div className="panel__title">
+          <span>Rounds</span>
+          <span>last {ROUNDS}</span>
+        </div>
+        <div className="panel__body">
+          <div className="table-wrap">
+            <table className="table" data-testid="rounds-table">
+              <thead>
+                <tr>
+                  <th>Round</th>
+                  <th>Minimum</th>
+                  <th>Work</th>
+                  <th>Released</th>
+                  <th>State</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {(rounds ?? []).map((r) => (
+                  <tr key={r.round.toString()}>
+                    <td>#{r.round.toString()}</td>
+                    <td>{r.active ? `${r.minDifficulty} bits` : '—'}</td>
+                    <td>{r.active ? formatWorkBits(r.work) : '—'}</td>
+                    <td>{r.closed ? formatTokens(r.release) : '—'}</td>
+                    <td>{r.closed ? 'closed' : r.active ? 'open' : 'empty'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
     </>

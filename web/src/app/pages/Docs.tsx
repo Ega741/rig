@@ -3,10 +3,10 @@ import type { UiConfig } from '../config';
 export function Docs({ config }: { config: UiConfig }) {
   return (
     <article className="prose">
-      <h1>How mining works</h1>
-      <p>
+      <h1>How it works</h1>
+      <p className="lead">
         Your browser hashes <code>keccak256(your address ‖ round challenge ‖ nonce)</code> until the result starts with enough zero bits. Each such
-        hash is a share. Shares are sent to the HashMine contract in batches of up to 64, and the contract recomputes every hash before it counts.
+        hash is a share. Shares go to the HashMine contract in batches of up to 64, and the contract recomputes every hash before it counts.
       </p>
       <h2>Rounds</h2>
       <p>

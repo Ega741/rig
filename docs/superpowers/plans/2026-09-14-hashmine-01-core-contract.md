@@ -42,7 +42,7 @@
 - [ ] **Step 1: Создать проект и зависимости**
 
 ```bash
-cd ~/Desktop/hashmine
+cd ~/Desktop/rig
 forge init contracts --no-git --shallow
 rm -f contracts/src/Counter.sol contracts/test/Counter.t.sol contracts/script/Counter.s.sol
 rm -rf contracts/lib/forge-std
@@ -51,7 +51,7 @@ forge install foundry-rs/forge-std --shallow
 forge install OpenZeppelin/openzeppelin-contracts@v5.1.0 --shallow
 ```
 
-Expected: в `~/Desktop/hashmine/.gitmodules` две записи с путями `contracts/lib/forge-std` и `contracts/lib/openzeppelin-contracts`. Если `forge install` откажется работать как подмодуль из подпапки, повторить обе установки с флагом `--no-git` и добавить `contracts/lib/` в `.gitignore`.
+Expected: в `~/Desktop/rig/.gitmodules` две записи с путями `contracts/lib/forge-std` и `contracts/lib/openzeppelin-contracts`. Если `forge install` откажется работать как подмодуль из подпапки, повторить обе установки с флагом `--no-git` и добавить `contracts/lib/` в `.gitignore`.
 
 - [ ] **Step 2: Записать `contracts/foundry.toml`**
 
@@ -95,12 +95,12 @@ node_modules/
 
 - [ ] **Step 4: Проверить сборку пустого проекта**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge build`
+Run: `cd ~/Desktop/rig/contracts && forge build`
 Expected: `No files changed, compilation skipped` или `Compiler run successful` без ошибок.
 
 - [ ] **Step 5: Checkpoint**
 
-Run: `cd ~/Desktop/hashmine && git status --short`
+Run: `cd ~/Desktop/rig && git status --short`
 Expected: `.gitignore`, `.gitmodules`, `contracts/foundry.toml`, `contracts/lib/...`, `docs/`.
 
 ---
@@ -182,7 +182,7 @@ library ShareFinder {
 
 - [ ] **Step 3: Проверить компиляцию**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge build`
+Run: `cd ~/Desktop/rig/contracts && forge build`
 Expected: `Compiler run successful`.
 
 - [ ] **Step 4: Checkpoint** — `git status --short` показывает два новых файла в `contracts/test/utils/`.
@@ -275,7 +275,7 @@ contract HashMineTest is Test {
 
 - [ ] **Step 2: Убедиться, что тесты не компилируются**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-contract HashMineTest`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-contract HashMineTest`
 Expected: FAIL — `Source "../src/HashMine.sol" not found` (или аналогичная ошибка импорта).
 
 - [ ] **Step 3: Записать `contracts/src/HashMine.sol` (скелет)**
@@ -430,7 +430,7 @@ contract HashMine {
 
 - [ ] **Step 4: Прогнать тесты**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-contract HashMineTest -vv`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-contract HashMineTest -vv`
 Expected: `4 passed; 0 failed`. Предупреждения о неиспользуемых импортах `SafeERC20`/`SafeCast` на этом шаге допустимы, их использует Task 4–5.
 
 - [ ] **Step 5: Checkpoint** — `git status --short`: новые `contracts/src/HashMine.sol`, `contracts/test/HashMine.t.sol`.
@@ -614,7 +614,7 @@ Expected: `4 passed; 0 failed`. Предупреждения о неисполь
 
 - [ ] **Step 3: Убедиться, что тесты падают**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-contract HashMineTest`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-contract HashMineTest`
 Expected: FAIL компиляции — `Member "submit" not found`.
 
 - [ ] **Step 4: Добавить в `HashMine.sol` секцию mutations (перед `// ---- views`) и приватные функции**
@@ -685,7 +685,7 @@ Expected: FAIL компиляции — `Member "submit" not found`.
 
 - [ ] **Step 5: Прогнать тесты**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-contract HashMineTest -vv`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-contract HashMineTest -vv`
 Expected: `22 passed; 0 failed`.
 
 - [ ] **Step 6: Checkpoint** — `git status --short`: изменены `HashMine.sol`, `HashMine.t.sol`.
@@ -832,7 +832,7 @@ Expected: `22 passed; 0 failed`.
 
 - [ ] **Step 3: Убедиться, что тесты падают**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-contract HashMineTest`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-contract HashMineTest`
 Expected: FAIL компиляции — `Member "rewardPool" not found`.
 
 - [ ] **Step 4: Добавить `claim` в секцию mutations (после `submit`)**
@@ -909,7 +909,7 @@ Expected: FAIL компиляции — `Member "rewardPool" not found`.
 
 - [ ] **Step 7: Прогнать тесты**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-contract HashMineTest -vv`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-contract HashMineTest -vv`
 Expected: `33 passed; 0 failed` (fuzz-тест — 256 прогонов).
 
 - [ ] **Step 8: Checkpoint** — `git status --short`.
@@ -1028,7 +1028,7 @@ contract HashMineInvariantTest is Test {
 
 - [ ] **Step 2: Прогнать инварианты**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-contract HashMineInvariantTest -vv`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-contract HashMineInvariantTest -vv`
 Expected: `3 passed; 0 failed`, в выводе `runs: 64, calls: 4096` для каждого инварианта и ненулевое число вызовов `submit` и `claim` в таблице handler-вызовов.
 
 - [ ] **Step 3: Checkpoint** — `git status --short`.
@@ -1101,12 +1101,12 @@ contract HashMineGasTest is Test {
 
 - [ ] **Step 2: Прогнать и записать цифры**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test --match-contract HashMineGasTest -vv`
+Run: `cd ~/Desktop/rig/contracts && forge test --match-contract HashMineGasTest -vv`
 Expected: `1 passed`, шесть строк с газом. Цифры внести в отчёт по плану. Ориентир — `submit` на 64 шары ≤ 150 000 газа исполнения. Если больше, это сигнал для оптимизации хэширования в assembly отдельной задачей, а не повод молча переписывать.
 
 - [ ] **Step 3: Полный прогон**
 
-Run: `cd ~/Desktop/hashmine/contracts && forge test`
+Run: `cd ~/Desktop/rig/contracts && forge test`
 Expected: все сьюты зелёные: `HashMineTest` 33, `HashMineInvariantTest` 3, `HashMineGasTest` 1.
 
 - [ ] **Step 4: Checkpoint** — `git status --short`.

@@ -629,7 +629,7 @@ describe('loadConfig', () => {
 
 - [ ] **Step 3: Убедиться, что падают**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/app 2>&1 | tail -4`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/app 2>&1 | tail -4`
 Expected: FAIL — `Cannot find module '../format'` / `'../config'`.
 
 - [ ] **Step 4: Записать `web/src/app/format.ts`**
@@ -737,7 +737,7 @@ export function loadConfig(env: Record<string, string | undefined>, search: stri
 
 - [ ] **Step 6: Прогнать**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/app 2>&1 | tail -4`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/app 2>&1 | tail -4`
 Expected: `9 passed`.
 
 - [ ] **Step 7: Checkpoint** — `git status --short`.
@@ -775,7 +775,7 @@ Expected: `9 passed`.
 
 - [ ] **Step 2: Убедиться, что падает**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/miner/__tests__/controller.test.ts 2>&1 | tail -4`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/miner/__tests__/controller.test.ts 2>&1 | tail -4`
 Expected: FAIL (`onEvent` не существует / поля `undefined`).
 
 - [ ] **Step 3: Изменить `controller.ts`**
@@ -831,7 +831,7 @@ export type MinerEvent =
 
 - [ ] **Step 4: Прогнать**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run 2>&1 | tail -4 && npm run typecheck`
+Run: `cd ~/Desktop/rig/web && npx vitest run 2>&1 | tail -4 && npm run typecheck`
 Expected: `64 passed` (54 + 9 + 1), typecheck чистый (страницы ещё не написаны — если `App.tsx` уже есть, typecheck упадёт на импортах страниц; это ожидаемо до Task 6).
 
 - [ ] **Step 5: Checkpoint** — `git status --short`.
@@ -905,7 +905,7 @@ describe('wallet', () => {
 
 - [ ] **Step 2: Убедиться, что падает**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/app/__tests__/wallet.test.ts 2>&1 | tail -3`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/app/__tests__/wallet.test.ts 2>&1 | tail -3`
 Expected: FAIL — `Cannot find module '../wallet'`.
 
 - [ ] **Step 3: Записать `web/src/app/wallet.ts`**
@@ -961,7 +961,7 @@ export async function sendEth(provider: Eip1193Provider, from: Address, to: Addr
 
 - [ ] **Step 4: Прогнать**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/app 2>&1 | tail -4`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/app 2>&1 | tail -4`
 Expected: `12 passed`.
 
 - [ ] **Step 5: Checkpoint** — `git status --short`.
@@ -1486,7 +1486,7 @@ describe('stats', () => {
 
 - [ ] **Step 2: Убедиться, что падает**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run src/app/__tests__/stats.test.ts 2>&1 | tail -3`
+Run: `cd ~/Desktop/rig/web && npx vitest run src/app/__tests__/stats.test.ts 2>&1 | tail -3`
 Expected: FAIL — `Cannot find module '../stats'`.
 
 - [ ] **Step 3: Записать `web/src/app/stats.ts`**
@@ -1725,7 +1725,7 @@ export function Docs({ config }: { config: UiConfig }) {
 
 - [ ] **Step 6: Прогнать всё и собрать**
 
-Run: `cd ~/Desktop/hashmine/web && npx vitest run 2>&1 | tail -4 && npm run typecheck && npm run build 2>&1 | tail -4`
+Run: `cd ~/Desktop/rig/web && npx vitest run 2>&1 | tail -4 && npm run typecheck && npm run build 2>&1 | tail -4`
 Expected: `66 passed` (54 + 9 + 1 + 3 + 2... см. итог в отчёте), typecheck чистый, `vite build` без ошибок.
 
 - [ ] **Step 7: Checkpoint** — `git status --short`.
@@ -1803,7 +1803,7 @@ export async function startLocalChain() {
 
 ```js
 // End-to-end: anvil -> DeployLocal -> fund a session key -> mine in headless Chromium -> check chain state.
-// Env: HASHMINE_CHROME (browser binary), E2E_SECONDS (default 75), E2E_CORES (default 2), E2E_GPU (default 1).
+// Env: RIG_CHROME (browser binary), E2E_SECONDS (default 75), E2E_CORES (default 2), E2E_GPU (default 1).
 import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { chromium } from 'playwright-core';
@@ -1813,7 +1813,7 @@ import { createServer } from 'vite';
 import { startLocalChain } from './lib/localChain.mjs';
 
 const CHROME =
-  process.env.HASHMINE_CHROME ??
+  process.env.RIG_CHROME ??
   `${homedir()}/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`;
 const SECONDS = Number(process.env.E2E_SECONDS ?? 75);
 const CORES = Number(process.env.E2E_CORES ?? 2);
@@ -1896,7 +1896,7 @@ console.log('\ne2e passed');
 
 ```js
 // UI end-to-end: the real Mine page against anvil. Starts mining, waits for shares on screen and on chain,
-// opens Stats, saves screenshots to e2e-artifacts/. Env: HASHMINE_CHROME, E2E_UI_TIMEOUT (default 120 s).
+// opens Stats, saves screenshots to e2e-artifacts/. Env: RIG_CHROME, E2E_UI_TIMEOUT (default 120 s).
 import { existsSync, mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { chromium } from 'playwright-core';
@@ -1906,7 +1906,7 @@ import { createServer } from 'vite';
 import { startLocalChain } from './lib/localChain.mjs';
 
 const CHROME =
-  process.env.HASHMINE_CHROME ??
+  process.env.RIG_CHROME ??
   `${homedir()}/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`;
 const TIMEOUT_MS = Number(process.env.E2E_UI_TIMEOUT ?? 120) * 1000;
 const ARTIFACTS = 'e2e-artifacts';
@@ -1990,7 +1990,7 @@ console.log(`\nui e2e passed; screenshots in web/${ARTIFACTS}/`);
 
 - [ ] **Step 4: Прогнать оба e2e**
 
-Run: `cd ~/Desktop/hashmine/web && npm run test:e2e 2>&1 | tail -3 && npm run test:e2e-ui 2>&1 | tail -14`
+Run: `cd ~/Desktop/rig/web && npm run test:e2e 2>&1 | tail -3 && npm run test:e2e-ui 2>&1 | tail -14`
 Expected: `e2e passed`; `ui e2e passed`, все строки `ok`, скриншоты `web/e2e-artifacts/mine.png`, `stats.png`.
 
 - [ ] **Step 5: Посмотреть скриншот и оценить дизайн** — открыть `web/e2e-artifacts/mine.png`; критерии: полоса раунда читается как таймлайн, засечки видны, крупная цифра хешрейта, нет переполнений на 1200px; затем `resize` до 400px в браузерных инструментах и повторить проверку вручную.
@@ -2018,3 +2018,18 @@ Expected: `e2e passed`; `ui e2e passed`, все строки `ok`, скринш�
 4. **«Claimable now» → «Pending»**: `HashMine.pending()` включает оценку открытого раунда, `claim` её не выплачивает. Подпись и пояснение исправлены.
 5. **UI e2e:** гонка с балансом сессионного ключа (первое чтение до пополнения) — ожидание переписано на конкретную сумму; добавлена проверка отсутствия горизонтального скролла на 400px и скриншот `mine-mobile.png`; «1 miners» → «1 miner».
 6. **vitest:** 69 тестов (54 + format 6 + config 3 + wallet 3 + stats 2 + controller events 1).
+
+---
+
+## Рестайл под подачу hashcats.fun (2026-09-14, по просьбе пользователя)
+
+Референс снят с живого сайта (computed styles): фон `#07070a`, текст `#dee9fc`/`#b9c4dd`, панели `#1d1f26`/`#2b2d33`, рамка `#3b3a45`, лайм `#add064`, зелёный `#65b24c`, циан `#6fd3d5`, янтарь `#eabe57`; шрифты DotGothic16 (текст), Jersey 10 (заголовки и подписи капсом с разрядкой 2.24px), VT323 (цифры); сетка 3px, радиусы 0, рамки 9-slice.
+
+Что сделано:
+- `scripts/gen-frames.mjs` → `src/app/pixel-frames.css`: собственные 9-slice рамки (SVG data URI, ступенчатые углы, фаска), 5 вариантов: night, work (лайм), green, ghost, input.
+- `styles.css` переписан целиком; `main.tsx` грузит `@fontsource/{dotgothic16,jersey-10,vt323}`, старые шрифты удалены из зависимостей.
+- Новый компонент `HashStrip.tsx`: последняя найденная шара как 256 пиксельных бит (4×64), ведущие нули — лаймом, плюс hex с подсветкой. Контроллер теперь кладёт `hash` и `bits` в событие `hit` (`MinerEvent`), `useMiner` хранит `lastShare`.
+- Страницы перестроены в одну колонку 760px с панелями: MINER (рамка становится лаймовой при майнинге, статус с мигающей точкой), ROUND (циановая шапка), REWARDS, KEYS; сегмент CPU|GPU + ползунок ядер; пиксельный чекерный разделитель; футер в три колонки; пиксельная иконка видеокарты в бренде.
+- e2e-ui: ядра задаются через `input[type=range]` (fill не работает для range — значение ставится через нативный сеттер + событие `input`), проверка `.hashstrip__bit--lead ≥ 8`, скриншот `docs.png`.
+
+Отклонения: `Write` не смог перезаписать файлы, созданные скриптом извлечения (не были прочитаны) — записаны через shell. Заголовок Docs сменился на «How it works», e2e-проверка обновлена. Ненажатые кнопки сегмента при работе майнера тускнеют, нажатые остаются лаймовыми (иначе оба гасли в оливковый).

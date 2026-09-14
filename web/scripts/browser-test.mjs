@@ -1,14 +1,14 @@
 // Runs browser-tests/ in headless Chromium against the Vite dev server. Exit code 1 on any failure.
-// HASHMINE_CHROME overrides the browser binary (default: the cached Chromium 1243 with WebGPU on Metal).
+// RIG_CHROME overrides the browser binary (default: the cached Chromium 1243 with WebGPU on Metal).
 import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { chromium } from 'playwright-core';
 import { createServer } from 'vite';
 
 const CHROME =
-  process.env.HASHMINE_CHROME ??
+  process.env.RIG_CHROME ??
   `${homedir()}/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`;
-const CORES = Number(process.env.HASHMINE_TEST_CORES ?? 2);
+const CORES = Number(process.env.RIG_TEST_CORES ?? 2);
 const failures = [];
 const check = (ok, label) => {
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${label}`);
@@ -16,7 +16,7 @@ const check = (ok, label) => {
 };
 
 if (!existsSync(CHROME)) {
-  console.log(`FAIL browser binary not found: ${CHROME} (set HASHMINE_CHROME)`);
+  console.log(`FAIL browser binary not found: ${CHROME} (set RIG_CHROME)`);
   process.exit(1);
 }
 
@@ -32,9 +32,9 @@ try {
   const page = await browser.newPage();
   page.on('pageerror', (error) => console.log('[pageerror]', error.message));
   await page.goto(`${url}browser-tests/index.html`);
-  await page.waitForFunction(() => typeof window.hashmineTest === 'object');
+  await page.waitForFunction(() => typeof window.rigTest === 'object');
 
-  const gpu = await page.evaluate(() => window.hashmineTest.gpu());
+  const gpu = await page.evaluate(() => window.rigTest.gpu());
   console.log('gpu:', JSON.stringify(gpu));
   check(gpu.available, 'gpu: WebGPU adapter available');
   if (gpu.available) {
@@ -43,11 +43,21 @@ try {
     check(gpu.search.rate > 20e6, `gpu: ${(gpu.search.rate / 1e6).toFixed(1)} MH/s > 20`);
   }
 
-  const cpu = await page.evaluate((cores) => window.hashmineTest.cpu(cores), CORES);
+  const cpu = await page.evaluate((cores) => window.rigTest.cpu(cores), CORES);
   console.log('cpu:', JSON.stringify(cpu));
   check(cpu.errors.length === 0, `cpu: no worker errors`);
   check(cpu.search.hits > 0 && cpu.search.invalid.length === 0, `cpu: ${cpu.search.verified}/${cpu.search.hits} hits verified`);
   check(cpu.search.rate > 2e6 * CORES, `cpu: ${(cpu.search.rate / 1e6).toFixed(2)} MH/s > ${2 * CORES}`);
+
+  // Duty cycle is measured by the engines themselves (busy time / wall time); throughput ratios are only logged.
+  check(cpu.search.duty >= 0.85, `cpu at 100%: measured duty ${(cpu.search.duty * 100).toFixed(0)}%`);
+  const cpuHalf = await page.evaluate((cores) => window.rigTest.cpu(cores, 50), CORES);
+  check(cpuHalf.search.duty <= 0.55, `cpu at 50%: measured duty ${(cpuHalf.search.duty * 100).toFixed(0)}% (rate ${(cpuHalf.search.rate / 1e6).toFixed(2)} MH/s, ${((cpuHalf.search.rate / cpu.search.rate) * 100).toFixed(0)}% of full)`);
+  if (gpu.available) {
+    check(gpu.search.duty >= 0.85, `gpu at 100%: measured duty ${(gpu.search.duty * 100).toFixed(0)}%`);
+    const gpuHalf = await page.evaluate(() => window.rigTest.gpu(50));
+    check(gpuHalf.search.duty <= 0.55, `gpu at 50%: measured duty ${(gpuHalf.search.duty * 100).toFixed(0)}% (rate ${(gpuHalf.search.rate / 1e6).toFixed(1)} MH/s, ${((gpuHalf.search.rate / gpu.search.rate) * 100).toFixed(0)}% of full)`);
+  }
 } finally {
   await browser.close();
   await server.close();
