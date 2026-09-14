@@ -589,21 +589,23 @@ input[type='range']::-moz-range-thumb {
   display: inline-flex;
   gap: 12px;
 }
+/* Lives in the lime title bar: dark ink, the active scope solid and underlined, the other one faded. */
 .scope button {
   background: none;
   border: 0;
   padding: 0;
   cursor: pointer;
   font: inherit;
-  color: var(--ink-3);
+  color: var(--bg);
+  opacity: 0.45;
   text-transform: inherit;
   letter-spacing: inherit;
 }
 .scope button:hover {
-  color: var(--ink-2);
+  opacity: 0.8;
 }
 .scope .scope__on {
-  color: var(--lime);
+  opacity: 1;
   text-decoration: underline;
   text-underline-offset: 4px;
   text-decoration-thickness: var(--px);
