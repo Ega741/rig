@@ -87,9 +87,6 @@ export function App() {
             Docs
           </a>
         </nav>
-        <span className="pill frame frame--night" title={config.hashMine}>
-          <i>▪</i> {config.chain.name} · {shortAddress(config.hashMine)}
-        </span>
       </header>
       <div className="divider" />
       <main className="page">

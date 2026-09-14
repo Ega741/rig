@@ -158,18 +158,6 @@ h2 {
   color: var(--lime);
   border-bottom-color: var(--lime);
 }
-.pill {
-  margin-left: auto;
-  padding: 0 9px;
-  font-family: var(--font-num);
-  font-size: 20px;
-  color: var(--ink-2);
-  white-space: nowrap;
-}
-.pill i {
-  font-style: normal;
-  color: var(--lime);
-}
 .divider {
   height: 6px;
   background: repeating-conic-gradient(var(--frame) 0 25%, transparent 0 50%) 0 0 / 6px 6px;
