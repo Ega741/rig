@@ -27,7 +27,7 @@ cd contracts && set -a && . ./.env && set +a && HASHMINE_ADDRESS=0xe80B2B24dfB92
 
 - `web/.env.testnet` — `VITE_CHAIN=testnet`, `VITE_HASHMINE_ADDRESS=…`; сборка `vite build --mode testnet`, dev `vite --mode testnet`.
 - Локальный dev-сервер против testnet (`.claude/launch.json` в Claudiii, конфиг `rig-web-testnet`, порт 5190).
-- Хостинг: не выбран (ждёт ответа: Vercel как проект `rig` или другое).
+- Хостинг: Vercel, проект `rig` (team ega741), домен `rig.fan` (куплен пользователем в Vercel 2026-09-14). Деплой: `cd web && vercel --prod --yes`; `vercel.json` собирает `npm run build:testnet`. Первый деплой упал: Vercel заливает только `web/`, а векторы хэшей лежали в `contracts/` — копия перенесена в `web/src/engine/vectors/`, синхронизация в `scripts/export-abi.sh`.
 
 ## Смок против настоящей сети (не anvil)
 
