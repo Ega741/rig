@@ -11,7 +11,8 @@
     "abi": "bash ../scripts/export-abi.sh",
     "test:e2e": "node scripts/e2e-local.mjs",
     "test:e2e-ui": "node scripts/e2e-ui.mjs",
-    "build:testnet": "tsc -p tsconfig.json && vite build --mode testnet"
+    "build:testnet": "tsc -p tsconfig.json && vite build --mode testnet",
+    "build:mainnet": "tsc -p tsconfig.json && vite build --mode mainnet"
   },
   "dependencies": {
     "@fontsource/dotgothic16": "^5.3.0",

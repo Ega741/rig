@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Jersey+10&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/app/pixel-frames.css">
+<style>
+:root{--bg:#07070a;--ink:#dee9fc;--ink-2:#b9c4dd;--ink-3:#6b7390;--panel:#1d1f26;--panel-2:#2b2d33;--frame:#3b3a45;--lime:#add064;--green:#65b24c;--cyan:#6fd3d5;--amber:#eabe57;--dot:#2b2d33}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'DotGothic16','Courier New',monospace}
+.card{position:relative;width:1600px;height:900px;overflow:hidden;background-color:var(--bg);
+  background-image:radial-gradient(var(--dot) 2.2px,transparent 2.6px);background-size:48px 48px;background-position:24px 24px;
+  padding:60px 80px 56px;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center}
+.wordmark svg{height:48px;shape-rendering:crispEdges}
+.tag{font-family:'Jersey 10';font-size:36px;letter-spacing:3px;color:var(--ink-2);text-transform:uppercase;line-height:1}
+.tag b{color:var(--lime);font-weight:400}
+h1{font-family:'Jersey 10';font-weight:400;text-transform:uppercase;font-size:100px;line-height:.92;margin:52px 0 36px;letter-spacing:1px}
+h1 em{font-style:normal;color:var(--lime)}
+.panel{background:var(--panel);padding:30px 44px 34px;flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px}
+.head{display:flex;justify-content:space-between;font-family:'Jersey 10';font-size:30px;letter-spacing:3px;color:var(--ink-2);text-transform:uppercase;margin-bottom:6px;line-height:1}
+.head b{color:var(--amber);font-weight:400}
+.row{display:grid;grid-template-columns:84px 1fr;align-items:center;gap:30px;font-family:'VT323','Courier New',monospace;font-size:46px;line-height:1}
+.place{color:var(--lime)}
+.r2 .place{color:var(--green)} .r3 .place{color:var(--cyan)}
+.addr{color:var(--ink);letter-spacing:1px}
+.bar{height:26px;width:calc(round(down,100%,26px) - 4px);background:var(--panel-2);position:relative}
+.bar i{position:absolute;top:0;bottom:0;left:0;width:var(--w);background-color:var(--lime);
+  background-image:linear-gradient(90deg,transparent 0 22px,var(--panel) 22px 26px);background-size:26px 26px}
+.r2 .bar i{background-color:var(--green)} .r3 .bar i{background-color:var(--cyan)}
+.amt{text-align:right;color:var(--amber)}
+/* Unknown digits: pixel blocks instead of characters, same rhythm as the work bars. */
+.mask{display:inline-block;height:.5em;vertical-align:.04em;margin:0 .04em;background:repeating-linear-gradient(90deg,currentColor 0 .48em,transparent .48em .61em);opacity:.6}
+.m6{width:3.53em}.m4{width:2.31em}
+.addr .mask{color:var(--ink-2)}.amt .mask{color:var(--amber)}
+.foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:36px;font-size:24px;color:var(--ink-2);line-height:1.2}
+.foot b{color:var(--lime);font-weight:400}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top">
+    <div class="wordmark">{{WORDMARK}}</div>
+    <div class="tag">ROUND <b>1</b> · 10:00 · ROBINHOOD CHAIN</div>
+  </div>
+  <h1>Round one closes.<br>Top 3 miners <em>get paid in ETH.</em></h1>
+  <section class="panel frame frame--night">
+    <div class="head"><span>Round 1 · work</span><span><b>could be you</b></span></div>
+    <div class="row r1"><span class="place">#1</span><div class="bar"><i style="--w:100%"></i></div></div>
+    <div class="row r2"><span class="place">#2</span><div class="bar"><i style="--w:61%"></i></div></div>
+    <div class="row r3"><span class="place">#3</span><div class="bar"><i style="--w:34%"></i></div></div>
+  </section>
+  <div class="foot">
+    <span>no NFT · no presale · no team cut · trading fees → miners</span>
+    <span><b>rig.fan</b> — tab open = you're in the round</span>
+  </div>
+</div>
+</body>
+</html>

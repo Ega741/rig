@@ -44,3 +44,8 @@ export async function ensureChain(provider: Eip1193Provider, chain: Chain, rpcUr
 export async function sendEth(provider: Eip1193Provider, from: Address, to: Address, valueWei: bigint): Promise<Hex> {
   return (await provider.request({ method: 'eth_sendTransaction', params: [{ from, to, value: numberToHex(valueWei) }] })) as Hex;
 }
+
+/** One popup: a contract call (`data`) from the connected wallet. */
+export async function sendCall(provider: Eip1193Provider, from: Address, to: Address, data: Hex): Promise<Hex> {
+  return (await provider.request({ method: 'eth_sendTransaction', params: [{ from, to, data }] })) as Hex;
+}

@@ -28,6 +28,7 @@ export const ponsFactoryAbi = parseAbi([
   'function memeHook() view returns (address)',
   'function feeEscrow() view returns (address)',
   'function poolManager() view returns (address)',
+  'function transferCreatorFeeRecipient(address token, address newRecipient)',
 ]);
 
 export const ponsCurveAbi = parseAbi([

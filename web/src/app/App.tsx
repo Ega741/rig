@@ -5,13 +5,14 @@ import { Docs } from './pages/Docs';
 import { Mine } from './pages/Mine';
 import { Stats } from './pages/Stats';
 import { Token } from './pages/Token';
+import { Launch } from './pages/Launch';
 import { Wordmark } from './Wordmark';
 
-type Route = 'mine' | 'token' | 'stats' | 'docs';
+type Route = 'mine' | 'token' | 'stats' | 'docs' | 'launch';
 
 function routeFromHash(hash: string): Route {
   const name = hash.replace(/^#\/?/, '');
-  return name === 'stats' || name === 'docs' || name === 'token' ? name : 'mine';
+  return name === 'stats' || name === 'docs' || name === 'token' || name === 'launch' ? name : 'mine';
 }
 
 function useHashRoute(): Route {
@@ -76,6 +77,7 @@ export function App() {
         {route === 'token' && <Token config={config} />}
         {route === 'stats' && <Stats config={config} />}
         {route === 'docs' && <Docs config={config} />}
+        {route === 'launch' && <Launch config={config} />}
       </main>
       <div className="divider" />
       <footer className="footer">
