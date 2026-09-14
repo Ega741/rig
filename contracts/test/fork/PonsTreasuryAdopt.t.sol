@@ -10,7 +10,7 @@ contract PonsTreasuryAdoptTest is PonsForkBase {
         IPonsFactory.LaunchedToken memory info = FACTORY.getLaunchedToken(address(token));
         assertEq(info.deployer, creator, "launched from the wallet");
         assertEq(info.creatorFeeRecipient, address(treasury), "fees routed to the treasury");
-        assertEq(info.creatorTaxBps, 200);
+        assertEq(info.creatorTaxBps, 300);
         assertFalse(info.buybackEnabled);
         assertEq(uint8(info.phase), uint8(PonsGraduationPhase.NotGraduated));
         assertEq(treasury.token(), address(token));

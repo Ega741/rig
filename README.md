@@ -19,12 +19,12 @@ No NFTs. No presale. No team allocation. Nothing to install.
 ## How it works
 
 ```
- trade $RIG ── 3 % fee ──▶ PONS 1 % + creator 2 % ──▶ PonsTreasury ── ETH ──▶ HashMine pool
+ trade $RIG ── 4 % fee ──▶ PONS 1 % + creator 3 % ──▶ PonsTreasury ── ETH ──▶ HashMine pool
                                                                                     │
  browser miner ── keccak shares ──▶ HashMine ── round close ──▶ release ∝ work ◀────┘
 ```
 
-1. **Fees.** Every trade pays 3 %: the PONS base fee (1 %) plus the creator tax (2 %). About 2.7 % of volume reaches the project, in ETH.
+1. **Fees.** Every trade pays 4 %: the PONS base fee (1 %) plus the creator tax (3 %). About 3.7 % of volume reaches the project, in ETH.
 2. **Forward, not buyback.** `PonsTreasury` is the token's creator-fee recipient. `harvest()` — anyone can call it — pulls the fees from PONS and sends every wei to `HashMine`. Nothing is swapped, nothing is kept: the pool's only inflow is fees (and donations).
 3. **Rounds.** Every 600 s the pool releases 48 bps of its ETH to the round that just closed.
 4. **Shares.** A share is a nonce with `keccak256(beneficiary ‖ challenge ‖ nonce)` under the target. It is bound to your address, so nobody can submit your work as theirs. Reward = release × your work ÷ total work.
@@ -42,7 +42,7 @@ No NFTs. No presale. No team allocation. Nothing to install.
 | | |
 |---|---|
 | Launch | [PONS](https://pons.fun) on Robinhood Chain |
-| Trade fee | 3 % (1 % PONS + 2 % creator) → ≈2.7 % of volume to the mining pool, in ETH |
+| Trade fee | 4 % (1 % PONS + 3 % creator) → ≈3.7 % of volume to the mining pool, in ETH |
 | Team / reserve | 0 |
 | Pool inflow | trading fees forwarded by `PonsTreasury.harvest()`; no buyback, no swap |
 | Round | 600 s, releases 48 bps of the pool |

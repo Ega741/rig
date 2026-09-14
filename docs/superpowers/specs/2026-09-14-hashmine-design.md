@@ -16,7 +16,7 @@
 |---|---|
 | Сеть | Robinhood Chain: mainnet 4663, testnet 46630 |
 | Лаунч | PONS V2, launch config 0 |
-| Комиссия для трейдера | 3% = 1% базовой комиссии PONS + 2% creator tax (`creatorTaxBps = 200`) |
+| Комиссия для трейдера | 4% = 1% базовой комиссии PONS + 3% creator tax (решение 2026-09-14 вечером; до этого 2%) (`creatorTaxBps = 300`) |
 | NFT | Нет |
 | Источник наград | Только выкуп токена на наши комиссии. Резерва и аллокации нет |
 | Доля команды | 0%. Всё, что приходит, идёт на выкуп для майнеров |
@@ -61,12 +61,12 @@
 Производные значения (моя арифметика по формуле constant product из `PonsV2BondingCurve`):
 - на curve продаётся 714.3M токенов, 285.7M уходят в пул при graduation;
 - капитализация на старте ≈ 1.68 ETH, на graduation ≈ 20.6 ETH;
-- нам приходит 2.7% оборота: creator tax 2% целиком плюс 70% от базовой комиссии 1%.
+- нам приходит 3.7% оборота: creator tax 3% целиком плюс 70% от базовой комиссии 1%.
 
 ## 3. Архитектура
 
 ```
-трейдеры ──3%──► PONS curve / хук ──2.7% в ETH──► fee escrow
+трейдеры ──4%──► PONS curve / хук ──3.7% в ETH──► fee escrow
                                                       │ claim()
                                                       ▼
                         PonsTreasury.harvest() ── покупает токен ──► HashMine (пул наград)
@@ -100,7 +100,7 @@
 `onlyOwner`, один раз. Порядок на мейннете:
 
 1. Деплой `HashMine` и `PonsTreasury` (до запуска токена — адрес treasury нужен заранее).
-2. Пользователь запускает токен на PONS со своего кошелька (creatorTaxBps = 200, buyback выключен, пара — ETH).
+2. Пользователь запускает токен на PONS со своего кошелька (creatorTaxBps = 300, buyback выключен, пара — ETH).
 3. С того же кошелька: `factory.transferCreatorFeeRecipient(token, treasury)` (или сразу указать treasury получателем при запуске, если сайт PONS это позволяет).
 4. `treasury.adopt(token)`. Контракт проверяет по фабрике: запуск существует, `creatorFeeRecipient == treasury`, `pairToken == 0` (комиссии в ETH). Иначе revert — чужой или не-ETH токен привязать нельзя.
 
@@ -114,7 +114,7 @@
 4. Весь `address(this).balance` переводится в `HashMine` низкоуровневым `call`; неудача — revert `TransferFailed`.
 5. Эмитит `Harvested(forwarded, phase)`.
 
-Проверено форк-тестами против настоящего PONS (блок 62 704 000): покупка на 1 ETH → `harvest()` → ровно 0.027 ETH в `HashMine`; после graduation — комиссии продаж уходят без оператора, комиссии покупок (в токене) — после конвертации оператором.
+Проверено форк-тестами против настоящего PONS (блок 62 704 000): покупка на 1 ETH → `harvest()` → ровно 0.037 ETH в `HashMine` (tax 3%); после graduation — комиссии продаж уходят без оператора, комиссии покупок (в токене) — после конвертации оператором.
 
 ### 4.4 Миграция получателя комиссий
 
@@ -280,7 +280,7 @@ Testnet — публичный RPC. Mainnet — платный (Alchemy), клю
 ## 8. Выкладка
 
 1. **Testnet 46630.** `HashMine` с пулом в тестнетном ETH; вместо harvest — `TopUp.s.sol` переводит ETH на `HashMine`. Публичный тест майнинга с живыми кошельками.
-2. **Mainnet 4663 — только по явной команде «mainnet».** Порядок (ревизия §4): `DeployMainnet.s.sol` (HashMine + PonsTreasury, owner — кошелёк пользователя) → пользователь запускает токен на PONS (пара ETH, tax 2%, buyback off) → `transferCreatorFeeRecipient(token, treasury)` с кошелька → `adopt(token)` → проверка ончейн `getLaunchedToken(token).creatorFeeRecipient == treasury` → сайт переключается на mainnet-адреса (`VITE_CHAIN=mainnet`, `VITE_HASHMINE_ADDRESS`, `VITE_TREASURY_ADDRESS`, `VITE_FEE_ESCROW_ADDRESS`, `VITE_PONS_TOKEN`).
+2. **Mainnet 4663 — только по явной команде «mainnet».** Порядок (ревизия §4): `DeployMainnet.s.sol` (HashMine + PonsTreasury, owner — кошелёк пользователя) → пользователь запускает токен на PONS (пара ETH, tax 3%, buyback off) → `transferCreatorFeeRecipient(token, treasury)` с кошелька → `adopt(token)` → проверка ончейн `getLaunchedToken(token).creatorFeeRecipient == treasury` → сайт переключается на mainnet-адреса (`VITE_CHAIN=mainnet`, `VITE_HASHMINE_ADDRESS`, `VITE_TREASURY_ADDRESS`, `VITE_FEE_ESCROW_ADDRESS`, `VITE_PONS_TOKEN`).
 3. Мейннет-деплой можно делать до запуска токена: `HashMine` больше не зависит от адреса токена.
 
 ## 9. Риски

@@ -22,7 +22,7 @@ export function Docs({ config }: { config: UiConfig }) {
       </p>
       <h2>Where the ETH comes from</h2>
       <p>
-        Trading the token on PONS pays a 3% fee. The part that reaches the project, about 2.7% of every trade, is forwarded to the mining pool as
+        Trading the token on PONS pays a 4% fee. The part that reaches the project, about 3.7% of every trade, is forwarded to the mining pool as
         ETH, untouched: no buyback, no swap, no team cut. Anyone can trigger the forward with <code>harvest()</code>. The pool is exactly what the
         fees and donations put there, and miners are the only ones who can take anything out.
       </p>

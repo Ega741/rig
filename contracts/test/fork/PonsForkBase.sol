@@ -49,7 +49,7 @@ abstract contract PonsForkBase is Test {
             description: "",
             socials: IPonsFactory.Socials("", "", "", "", ""),
             creatorFeeRecipient: who,
-            creatorTaxBps: 200,
+            creatorTaxBps: 300,
             buybackEnabled: false,
             expectedEconomics: FACTORY.previewLaunchEconomics(0, address(0)),
             salt: salt

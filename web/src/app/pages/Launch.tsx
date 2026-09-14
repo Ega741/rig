@@ -107,7 +107,7 @@ export function Launch({ config }: { config: UiConfig }) {
               <dt>Launched by</dt>
               <dd>{launch.deployer}</dd>
               <dt>Creator tax</dt>
-              <dd>{(launch.creatorTaxBps / 100).toFixed(2)}%</dd>
+              <dd>{(launch.creatorTaxBps / 100).toFixed(2)}% {launch.creatorTaxBps === 300 ? '✓' : '— expected 3.00%'}</dd>
               <dt>Quote</dt>
               <dd>{launch.pairToken === '0x0000000000000000000000000000000000000000' ? 'ETH' : `${launch.pairToken} (not ETH — the treasury will refuse to adopt)`}</dd>
             </dl>

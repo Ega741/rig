@@ -29,10 +29,10 @@ contract PonsTreasuryHarvestTest is PonsForkBase {
 
         uint256 forwarded = treasury.harvest();
 
-        // A 1 ETH buy pays 2% creator tax + 70% of the 1% base fee = 0.027 ETH to the creator.
-        assertEq(forwarded, 0.027 ether);
-        assertEq(address(mine).balance, 0.027 ether, "everything reached HashMine");
-        assertEq(mine.rewardPool(), 0.027 ether, "and counts as pool");
+        // A 1 ETH buy pays 3% creator tax + 70% of the 1% base fee = 0.037 ETH to the creator.
+        assertEq(forwarded, 0.037 ether);
+        assertEq(address(mine).balance, 0.037 ether, "everything reached HashMine");
+        assertEq(mine.rewardPool(), 0.037 ether, "and counts as pool");
         assertEq(address(treasury).balance, 0, "nothing stays in the treasury");
         assertEq(treasury.feeEscrow().balanceOf(address(treasury)), 0, "escrow claimed");
     }
@@ -43,13 +43,13 @@ contract PonsTreasuryHarvestTest is PonsForkBase {
         _curveBuy(1 ether);
         uint256 forwarded = treasury.harvest();
         assertGt(forwarded, 0);
-        assertEq(address(mine).balance, 0.027 ether + forwarded);
+        assertEq(address(mine).balance, 0.037 ether + forwarded);
     }
 
     function test_harvest_anyoneCanCall() public {
         _curveBuy(1 ether);
         vm.prank(trader);
-        assertEq(treasury.harvest(), 0.027 ether);
+        assertEq(treasury.harvest(), 0.037 ether);
     }
 
     // ----------------------------------------------------------------- pool

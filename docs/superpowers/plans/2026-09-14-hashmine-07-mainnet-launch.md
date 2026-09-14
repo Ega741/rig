@@ -20,7 +20,7 @@ wallet transactions is one command.
 
 ## Launch (user, on the PONS site, from their wallet)
 
-- Pair: **ETH**. Creator tax: **2 %** (`creatorTaxBps = 200`). Buyback: **off**.
+- Pair: **ETH**. Creator tax: **3 %** (`creatorTaxBps = 300`) — total 4 % with the PONS base fee. Buyback: **off**.
 - If the PONS form has a "creator fee recipient" field: put the **TREASURY** address there and skip step "transfer".
 
 ## Right after launch
