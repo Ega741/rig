@@ -12,10 +12,12 @@ import {
   type FeeHistory,
   type PonsSnapshot,
 } from '../../chain/pons';
+import { fetchEthUsd, formatUsd, weiToUsd } from '../../chain/ethUsd';
 import type { UiConfig } from '../config';
 import { formatTokens, shortAddress } from '../format';
 
 const POLL_MS = 3000;
+const ETH_USD_POLL_MS = 60_000;
 
 function quoteAmount(units: bigint, decimals: number, digits = 4): string {
   const value = Number(formatUnits(units, decimals));
@@ -34,6 +36,7 @@ export function Token({ config }: { config: UiConfig }) {
   const [history, setHistory] = useState<FeeHistory | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<number | null>(null);
+  const [ethUsd, setEthUsd] = useState<number | null>(null);
   const clientRef = useRef<PublicClient | null>(null);
   const historyRef = useRef<FeeHistory | null>(null);
   const hookRef = useRef<Address | null>(null);
@@ -77,10 +80,26 @@ export function Token({ config }: { config: UiConfig }) {
     };
   }, [token, client]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const tick = async () => {
+      const v = await fetchEthUsd();
+      if (!cancelled && v !== null) setEthUsd(v);
+    };
+    void tick();
+    const timer = setInterval(() => void tick(), ETH_USD_POLL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, []);
+
   const s = snapshot;
   const dec = s?.quoteDecimals ?? 18;
   const unit = s?.quoteSymbol ?? 'ETH';
   const eth = (units: bigint, digits = 4) => quoteAmount(units, dec, digits);
+  /** USD figures only make sense for ETH-quoted launches; other quotes keep their own unit. */
+  const usd = ethUsd !== null && unit === 'ETH' ? (wei: bigint) => formatUsd(weiToUsd(wei, ethUsd)) : null;
   const phaseLabel = s ? { 0: 'on the curve', 1: 'graduating', 2: 'in the pool', 3: 'rescued' }[s.phase] : '';
   const graduationPct = s && s.graduationThreshold > 0n ? Number((s.realQuoteReserve * 10_000n) / s.graduationThreshold) / 100 : 0;
   const earnedWei = history
@@ -164,17 +183,19 @@ export function Token({ config }: { config: UiConfig }) {
           <section className="panel frame frame--night" aria-label="Market">
             <div className="panel__title panel__title--cyan">
               <span>Market</span>
-              <span>{phaseLabel}</span>
+              <span>{ethUsd !== null ? `${phaseLabel} · ETH ${formatUsd(ethUsd)}` : phaseLabel}</span>
             </div>
             <div className="panel__body">
               <div className="stats stats--4">
                 <div className="stat">
                   <span className="label">Price</span>
-                  <span className="num num--cyan">{s ? `${tokenPrice(s.weiPerToken, dec)} ${unit}` : '—'}</span>
+                  <span className="num num--cyan" data-testid="price-usd">{s && usd ? usd(s.weiPerToken) : s ? `${tokenPrice(s.weiPerToken, dec)} ${unit}` : '—'}</span>
+                  {s && usd && <span className="sub">{tokenPrice(s.weiPerToken, dec)} ETH</span>}
                 </div>
                 <div className="stat">
                   <span className="label">Market cap</span>
-                  <span className="num">{s ? `${eth(s.marketCapWei, 2)} ${unit}` : '—'}</span>
+                  <span className="num" data-testid="mcap-usd">{s && usd ? usd(s.marketCapWei) : s ? `${eth(s.marketCapWei, 2)} ${unit}` : '—'}</span>
+                  {s && usd && <span className="sub">{eth(s.marketCapWei, 2)} ETH</span>}
                 </div>
                 <div className="stat">
                   <span className="label">{unit} on the curve</span>

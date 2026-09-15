@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Jersey+10&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/app/pixel-frames.css">
+<style>
+:root{--bg:#07070a;--ink:#dee9fc;--ink-2:#b9c4dd;--ink-3:#6b7390;--panel:#1d1f26;--panel-2:#2b2d33;--frame:#3b3a45;--lime:#add064;--green:#65b24c;--cyan:#6fd3d5;--amber:#eabe57;--dot:#2b2d33}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'DotGothic16','Courier New',monospace}
+.card{position:relative;width:1600px;height:900px;overflow:hidden;background-color:var(--bg);
+  background-image:radial-gradient(var(--dot) 2.2px,transparent 2.6px);background-size:48px 48px;background-position:24px 24px;
+  padding:56px 80px 52px;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center}
+.wordmark svg{height:48px;shape-rendering:crispEdges}
+.tag{font-family:'Jersey 10';font-size:34px;letter-spacing:3px;color:var(--ink-2);text-transform:uppercase;line-height:1}
+.tag b{color:var(--lime);font-weight:400}
+h1{font-family:'Jersey 10';font-weight:400;text-transform:uppercase;font-size:104px;line-height:.92;margin:44px 0 34px;letter-spacing:1px}
+h1 em{font-style:normal;color:var(--lime)}
+.panel{background:var(--panel);padding:26px 40px 28px;display:flex;flex-direction:column;gap:16px}
+.head{display:flex;justify-content:space-between;font-family:'Jersey 10';font-size:28px;letter-spacing:3px;color:var(--ink-2);text-transform:uppercase;line-height:1;margin-bottom:4px}
+.head b{color:var(--amber);font-weight:400}
+.row{display:grid;grid-template-columns:84px 300px 1fr 330px;align-items:center;gap:26px;font-family:'VT323','Courier New',monospace;font-size:44px;line-height:1;white-space:nowrap}
+.place{color:var(--lime)} .r2 .place{color:var(--green)} .r3 .place{color:var(--cyan)}
+.addr{color:var(--ink);letter-spacing:.5px} .row.empty .addr{color:var(--ink-3)}
+.bar{height:24px;width:calc(round(down,100%,24px) - 4px);background:var(--panel-2);position:relative}
+.bar i{position:absolute;top:0;bottom:0;left:0;width:var(--w);background-color:var(--lime);background-image:linear-gradient(90deg,transparent 0 20px,var(--panel) 20px 24px);background-size:24px 24px}
+.note{color:var(--ink-2);text-align:right} .row.empty .note{color:var(--amber)}
+.pool{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px;padding-top:16px;border-top:3px solid var(--panel-2);font-family:'Jersey 10';font-size:30px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-2);line-height:1}
+.pool b{color:var(--lime);font-weight:400;font-family:'VT323';font-size:1.25em;letter-spacing:0;text-transform:none}
+.foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:auto;font-size:24px;color:var(--ink-2);line-height:1.25;gap:24px}
+.foot b{color:var(--lime);font-weight:400}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top">
+    <div class="wordmark">{{WORDMARK}}</div>
+    <div class="tag">ROUND <b>54</b> · ROBINHOOD CHAIN · MAINNET</div>
+  </div>
+  <h1>One miner. Nine rounds.<br><em>Alone.</em></h1>
+  <section class="panel frame frame--night">
+    <div class="head"><span>Leaderboard · 9 rounds paid</span><span><b>could be you</b></span></div>
+    <div class="row r1"><span class="place">#1</span><span class="addr">0x04f8…7cb1</span><div class="bar"><i style="--w:100%"></i></div><span class="note">every round, alone</span></div>
+    <div class="row r2 empty"><span class="place">#2</span><span class="addr">—</span><div class="bar"></div><span class="note">nobody</span></div>
+    <div class="row r3 empty"><span class="place">#3</span><span class="addr">—</span><div class="bar"></div><span class="note">nobody</span></div>
+    <div class="pool"><span>pool <b>0.158 ETH</b></span><span>releases 0.48% every 10 min to whoever sent shares</span></div>
+  </section>
+  <div class="foot">
+    <span>your browser · your address · ETH to your wallet</span>
+    <span><b>rig.fan</b> → Start</span>
+  </div>
+</div>
+</body>
+</html>

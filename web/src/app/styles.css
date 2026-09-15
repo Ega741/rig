@@ -651,3 +651,12 @@ input[type='range']::-moz-range-thumb {
 .table--board a:hover {
   color: var(--lime);
 }
+
+/* Secondary figure under a stat, e.g. the ETH value below a USD price. */
+.stat .sub {
+  font-family: var(--font-num);
+  font-size: 17px;
+  color: var(--ink-3);
+  line-height: 1.1;
+  margin-top: 2px;
+}
