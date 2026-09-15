@@ -11,6 +11,7 @@ import {
 import type { PrivateKeyAccount } from 'viem/accounts';
 import type { ChainReader, PriceSource, RoundState, Submitter } from '../miner/controller';
 import { hashMineAbi } from './abi/hashMine';
+import { rpcTransport } from './transport';
 import { ponsEscrowAbi } from './abi/ponsEscrow';
 import { ponsTreasuryAbi } from './abi/ponsTreasury';
 
@@ -20,7 +21,7 @@ export interface ChainClients {
 }
 
 export function createClients(chain: Chain, rpcUrl: string, account: PrivateKeyAccount): ChainClients {
-  const transport = http(rpcUrl);
+  const transport = rpcTransport(chain.id, rpcUrl);
   return {
     publicClient: createPublicClient({ chain, transport }),
     walletClient: createWalletClient({ chain, transport, account }),

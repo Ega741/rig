@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { createPublicClient, http, isAddress, getAddress, type Address } from 'viem';
+import { createPublicClient, isAddress, getAddress, type Address } from 'viem';
 import type { UiConfig } from '../config';
 import { robinhood } from '../../chain/chains';
+import { rpcTransport } from '../../chain/transport';
 import { feeRouteCalldata, feeRouteStatus, type FeeRoute } from '../../chain/feeRoute';
 import { PONS_FACTORY, ponsFactoryAbi } from '../../chain/pons';
 import { connectWallet, ensureChain, injectedProvider, sendCall } from '../wallet';
@@ -22,7 +23,7 @@ export function Launch({ config }: { config: UiConfig }) {
   const [launch, setLaunch] = useState<Launch | null>(null);
   const [status, setStatus] = useState('');
   const provider = injectedProvider();
-  const client = createPublicClient({ chain: robinhood, transport: http(config.ponsRpcUrl) });
+  const client = createPublicClient({ chain: robinhood, transport: rpcTransport(robinhood.id, config.ponsRpcUrl) });
 
   const read = async (): Promise<Launch | null> => {
     if (!treasury || !isAddress(token)) return null;

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createPublicClient, formatUnits, http, type Address, type PublicClient } from 'viem';
+import { createPublicClient, formatUnits, type Address, type PublicClient } from 'viem';
 import { robinhood } from '../../chain/chains';
+import { rpcTransport } from '../../chain/transport';
 import {
   PONS_FACTORY,
   PonsPhase,
@@ -43,7 +44,7 @@ export function Token({ config }: { config: UiConfig }) {
   const busyRef = useRef(false);
 
   const client = useCallback((): PublicClient => {
-    if (!clientRef.current) clientRef.current = createPublicClient({ chain: robinhood, transport: http(config.ponsRpcUrl) });
+    if (!clientRef.current) clientRef.current = createPublicClient({ chain: robinhood, transport: rpcTransport(robinhood.id, config.ponsRpcUrl) });
     return clientRef.current;
   }, [config.ponsRpcUrl]);
 

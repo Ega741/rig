@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { createPublicClient, http } from 'viem';
+import { createPublicClient } from 'viem';
+import { rpcTransport } from '../../chain/transport';
 import { hashMineAbi } from '../../chain/abi/hashMine';
 import type { UiConfig } from '../config';
 import { formatReward, formatWorkBits, shortAddress } from '../format';
@@ -23,7 +24,7 @@ export function Stats({ config }: { config: UiConfig }) {
     setLoading(true);
     setError(null);
     try {
-      const client = createPublicClient({ chain: config.chain, transport: http(config.rpcUrl) });
+      const client = createPublicClient({ chain: config.chain, transport: rpcTransport(config.chain.id, config.rpcUrl) });
       const current = await client.readContract({ address: config.hashMine, abi: hashMineAbi, functionName: 'currentRound' });
       const [rows, entries] = await Promise.all([loadRounds(client, config.hashMine, current, ROUNDS), loadShareEntries(client, config.hashMine, BLOCK_SPAN)]);
       setRounds(rows);
