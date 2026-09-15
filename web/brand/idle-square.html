@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Jersey+10&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/app/pixel-frames.css">
+<style>
+:root{--bg:#07070a;--ink:#dee9fc;--ink-2:#b9c4dd;--ink-3:#6b7390;--panel:#1d1f26;--panel-2:#2b2d33;--frame:#3b3a45;--lime:#add064;--green:#65b24c;--cyan:#6fd3d5;--amber:#eabe57;--dot:#2b2d33}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'DotGothic16','Courier New',monospace}
+.card{position:relative;width:1080px;height:1080px;overflow:hidden;background-color:var(--bg);
+  background-image:radial-gradient(var(--dot) 2.2px,transparent 2.6px);background-size:48px 48px;background-position:24px 24px;
+  padding:52px 60px 48px;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center}
+.wordmark svg{height:48px;shape-rendering:crispEdges}
+.tag{font-family:'Jersey 10';font-size:26px;letter-spacing:3px;color:var(--ink-2);text-transform:uppercase;line-height:1}
+.tag b{color:var(--lime);font-weight:400}
+h1{font-family:'Jersey 10';font-weight:400;text-transform:uppercase;font-size:92px;line-height:.92;margin:40px 0 30px;letter-spacing:1px}
+h1 em{font-style:normal;color:var(--lime)}
+.panel{background:var(--panel);padding:26px 36px 28px;display:flex;flex-direction:column;gap:18px}
+.head{display:flex;flex-direction:column;gap:8px;font-family:'Jersey 10';font-size:26px;letter-spacing:3px;color:var(--ink-2);text-transform:uppercase;line-height:1}
+.head b{color:var(--lime);font-weight:400}
+.row{display:grid;grid-template-columns:70px 1fr;align-items:center;gap:20px;font-family:'VT323','Courier New',monospace;font-size:30px;line-height:1;white-space:nowrap}
+.row .k{font-family:'Jersey 10';font-size:24px;letter-spacing:3px;color:var(--ink-2);text-transform:uppercase}
+.row .note{grid-column:2;color:var(--ink-2);margin-top:-6px}
+.meter{display:flex;gap:4px}
+.meter i{flex:1;height:26px;background:var(--panel-2)}
+.meter i.on{background:var(--lime)}
+.meter i.off{background:var(--panel-2);outline:2px solid #34363e;outline-offset:-2px}
+.cycle{display:flex;gap:0;height:26px}
+.cycle i{flex:1;background:var(--panel-2)}
+.cycle i.w{background:var(--lime)}
+.legend{display:flex;flex-direction:column;gap:8px;font-family:'Jersey 10';font-size:22px;letter-spacing:2px;color:var(--ink-3);text-transform:uppercase;line-height:1}
+.legend b{color:var(--lime);font-weight:400}
+.foot{display:flex;flex-direction:column;gap:8px;margin-top:auto;font-size:20px;color:var(--ink-2);line-height:1.25}
+.foot b{color:var(--lime);font-weight:400}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top">
+    <div class="wordmark">{{WORDMARK}}</div>
+    <div class="tag">LOAD CAP <b>50%</b></div>
+  </div>
+  <h1>Your GPU<br>is idle<br><em>22 hours<br>a day.</em></h1>
+  <section class="panel frame frame--night">
+    <div class="head"><span>Machine</span><span>at most <b>half</b> · down to 10% · no restart</span></div>
+    <div class="row"><span class="k">CPU</span><div class="meter">
+      <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+      <i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i>
+    </div><span class="note">half the cores, never more</span></div>
+    <div class="row"><span class="k">GPU</span><div class="cycle">
+      <i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i></i><i></i><i></i><i></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i></i><i></i><i></i><i></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i></i><i></i><i></i><i></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i></i><i></i><i></i><i></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i></i><i></i><i></i><i></i>
+    </div><span class="note">works in bursts, rests as long</span></div>
+    <div class="legend"><span><b>■</b> work &nbsp; ■ rest &nbsp;·&nbsp; one second of the miner</span><span>measured, not promised</span></div>
+  </section>
+  <div class="foot">
+    <span>Netflix keeps playing · the fan doesn't scream · the ETH still lands</span>
+    <span><b>rig.fan</b> → Start</span>
+  </div>
+</div>
+</body>
+</html>
