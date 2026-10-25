@@ -100,22 +100,27 @@ export interface Batch {
   work: bigint;
 }
 
-/** One submit per (difficulty, chunk of 64), nonces strictly increasing as HashMine requires. */
+/**
+ * One submit per run of equal difficulty (at most 64 nonces), in increasing nonce order across all batches:
+ * HashMine keeps the beneficiary's last nonce for the whole round, so every batch must start above the
+ * previous batch's last nonce, not only be sorted inside itself.
+ */
 export function buildBatches(hits: Hit[]): Batch[] {
-  const byDifficulty = new Map<number, bigint[]>();
+  const byNonce = new Map<bigint, number>();
   for (const hit of hits) {
     const nonce = makeNonce(hit.segment, hit.worker, hit.counter);
-    const list = byDifficulty.get(hit.difficulty) ?? [];
-    list.push(nonce);
-    byDifficulty.set(hit.difficulty, list);
+    if (!byNonce.has(nonce)) byNonce.set(nonce, hit.difficulty);
   }
+  const sorted = [...byNonce.entries()].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
   const batches: Batch[] = [];
-  for (const difficulty of [...byDifficulty.keys()].sort((a, b) => a - b)) {
-    const nonces = [...new Set(byDifficulty.get(difficulty)!)].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
-    for (let i = 0; i < nonces.length; i += MAX_NONCES) {
-      const chunk = nonces.slice(i, i + MAX_NONCES);
-      batches.push({ difficulty, nonces: chunk, work: BigInt(chunk.length) << BigInt(difficulty) });
+  let current: Batch | null = null;
+  for (const [nonce, difficulty] of sorted) {
+    if (!current || current.difficulty !== difficulty || current.nonces.length === MAX_NONCES) {
+      current = { difficulty, nonces: [], work: 0n };
+      batches.push(current);
     }
+    current.nonces.push(nonce);
+    current.work += 1n << BigInt(difficulty);
   }
   return batches;
 }

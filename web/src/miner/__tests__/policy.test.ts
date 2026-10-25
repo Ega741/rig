@@ -85,3 +85,14 @@ describe('buildBatches', () => {
     expect(MAX_NONCES).toBe(64);
   });
 });
+
+describe('buildBatches across a difficulty change', () => {
+  it('keeps nonces increasing from one batch to the next, as HashMine requires within a round', () => {
+    // Warm-up shares at 24 bits, then the controller lowers the difficulty in the same segment (counters keep running).
+    const hits = [hit(0n, 0n, 1_000n, 24), hit(0n, 1n, 2_000n, 24), hit(0n, 0n, 50_000n, 21), hit(0n, 1n, 60_000n, 21)];
+    const batches = buildBatches(hits);
+    const all = batches.flatMap((b) => b.nonces);
+    for (let i = 1; i < all.length; i++) expect(all[i]! > all[i - 1]!).toBe(true);
+    expect(batches.reduce((sum, b) => sum + b.work, 0n)).toBe(2n * (1n << 24n) + 2n * (1n << 21n));
+  });
+});
